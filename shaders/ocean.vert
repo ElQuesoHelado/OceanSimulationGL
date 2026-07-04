@@ -28,4 +28,34 @@ out vec2 TexCoord;
 
 void main()
 {
+  vec3 pos = aPos;
+
+  float height = 0.0;
+
+  for(int i = 0; i < waveCount; i++)
+  {
+      // float k = (4.0 * 3.14159265 * waves[i].frequency * waves[i].frequency) / 9.81;
+      float k = (4.0 * 3.14159265 * 3.14159265 * waves[i].frequency * waves[i].frequency) / 9.81;
+
+      float theta =
+          k * (pos.x * cos(waves[i].direction)
+              + pos.z * sin(waves[i].direction))
+          - 2.0 * 3.14159265 * waves[i].frequency * time
+          + waves[i].phase;
+
+      height += waves[i].amplitude * cos(theta);
+  }
+
+  pos.y = height*3;
+
+  // Normal = aNormal;
+  Normal = vec3(0,1,0);
+  FragPos = pos;
+  // TexCoord = aTexCoord;
+  TexCoord = vec2(1,0);
+
+  gl_Position =
+      uProjection *
+      uView *
+      vec4(pos, 1.0);
 }

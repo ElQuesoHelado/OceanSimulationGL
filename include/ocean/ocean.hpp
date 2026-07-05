@@ -39,7 +39,6 @@ struct Ocean {
 
     for (size_t i = 0; i < npoints - 1; i++) {
       for (size_t j = 0; j < npoints - 1; j++) {
-
         GLuint v0 = i * npoints + j;
         GLuint v1 = v0 + 1;
         GLuint v2 = (i + 1) * npoints + j;

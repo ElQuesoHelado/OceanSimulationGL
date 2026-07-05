@@ -40,8 +40,17 @@ void App::run() {
     shader->setVec3("uColor", scene->color);
     scene->draw_gizmo();
 
+    ocean->shader->use();
+    ocean->shader->setMat4("uProjection", proj);
+    ocean->shader->setMat4("uView", camera.view());
+    ocean->shader->setBool("uLightingEnabled", enable_lighting);
+    ocean->shader->setVec3("lightPos", lightPos);
+    ocean->shader->setVec3("lightColor", glm::vec3(1));
+    ocean->shader->setVec3("viewPos", camera.position());
+    ocean->draw();
+
     //
-    // Render de piso
+    // Render de piso, necesariamente no wireframe
     //
     if (wireframe)
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -53,15 +62,6 @@ void App::run() {
     floor_shader->setVec3("uColor", {.3f, 1.f, .3f});
 
     // scene->draw_floor();
-
-    ocean->shader->use();
-    ocean->shader->setMat4("uProjection", proj);
-    ocean->shader->setMat4("uView", camera.view());
-    ocean->shader->setBool("uLightingEnabled", enable_lighting);
-    ocean->shader->setVec3("lightPos", lightPos);
-    ocean->shader->setVec3("lightColor", glm::vec3(1));
-    ocean->shader->setVec3("viewPos", camera.position());
-    ocean->draw();
 
     if (wireframe)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

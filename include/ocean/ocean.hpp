@@ -83,6 +83,19 @@ struct Ocean {
         points.data(),
         GL_STATIC_DRAW);
 
+    // TODO: normals, textures
+    // glNamedBufferData(
+    //     normalsVBO,
+    //     shape->npoints * 3 * sizeof(float),
+    //     shape->normals,
+    //     GL_STATIC_DRAW);
+    //
+    //   glNamedBufferData(
+    //       texCoordsVBO,
+    //       shape->npoints * 2 * sizeof(float),
+    //       shape->tcoords,
+    //       GL_STATIC_DRAW);
+
     glNamedBufferData(
         EBO,
         indices.size() * sizeof(GLuint),

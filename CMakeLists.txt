@@ -21,6 +21,8 @@ add_executable(app
     glad/src/glad.c
     src/par_shapes.cpp
     src/stb_image.cpp
+    src/ocean/config.cpp
+    src/ocean/draw.cpp
 )
 
 target_include_directories(app PRIVATE

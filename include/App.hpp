@@ -18,6 +18,8 @@
 #include "Texture.hpp"
 #include "primitives/Primitive.hpp"
 
+#include "ocean/ocean.hpp"
+
 #include "Scene.hpp"
 
 struct App {
@@ -57,6 +59,9 @@ struct App {
 
   void resize();
   void run();
+
+  // Ocean
+  std::unique_ptr<Ocean> ocean;
 
   App();
   ~App();

@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "par_shapes.h"
 #include "primitives/Primitive.hpp"
+#include <GLFW/glfw3.h>
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/ext/vector_float3.hpp>
@@ -22,7 +23,7 @@ void App::run() {
     shader->setMat4("uView", camera.view());
 
     // glm::vec3 lightPos(3.0f, 5.0f, 2.0f);
-    glm::vec3 lightPos({100, 100, 100});
+    glm::vec3 lightPos({200, 100, 200});
 
     // glm::vec3 lightPos(15, 20, 15);
 
@@ -48,7 +49,7 @@ void App::run() {
     ocean->shader->setVec3("lightColor", glm::vec3(1));
     ocean->shader->setVec3("viewPos", camera.position());
     ocean->shader->setFloat("shininess", 256.0f);
-    ocean->draw();
+    ocean->draw(glfwGetTime());
 
     //
     // Render de piso, necesariamente no wireframe

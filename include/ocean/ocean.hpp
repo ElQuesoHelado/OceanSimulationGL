@@ -64,10 +64,15 @@ struct Ocean {
             float(i) / float(npoints - 1),
             float(j) / float(npoints - 1));
 
-    waves.push_back({0.35f, 0.20f, 0.00f, 0.00f});
-    waves.push_back({0.20f, 0.35f, 0.785f, 1.57f});
-    waves.push_back({0.15f, 0.50f, 2.094f, 3.14f});
-    waves.push_back({0.10f, 0.15f, 4.189f, 0.78f});
+    // waves.push_back({0.35f, 0.20f, 0.00f, 0.00f});
+    // waves.push_back({0.20f, 0.35f, 0.785f, 1.57f});
+    // waves.push_back({0.15f, 0.50f, 2.094f, 3.14f});
+    // waves.push_back({0.10f, 0.15f, 4.189f, 0.78f});
+
+    waves.push_back({0.6f, 0.08f, 0.0f, 0.0f});
+    waves.push_back({0.35f, 0.12f, 0.4f, 1.3f});
+    waves.push_back({0.18f, 0.18f, -0.3f, 2.7f});
+    waves.push_back({0.09f, 0.28f, 0.7f, 0.5f});
 
     shader = std::make_unique<Shader>("shaders/ocean.vert", "shaders/ocean.frag");
 
@@ -108,5 +113,5 @@ struct Ocean {
     glVertexArrayElementBuffer(VAO, EBO);
   }
 
-  void draw();
+  void draw(float deltaTime);
 };

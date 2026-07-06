@@ -1,6 +1,6 @@
 #include "ocean/ocean.hpp"
 
-void Ocean::draw() {
+void Ocean::draw(float deltaTime) {
   shader->use();
   shader->setFloat("time", time);
 

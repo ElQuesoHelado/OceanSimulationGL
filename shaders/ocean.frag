@@ -28,7 +28,7 @@ void main()
 
   if(uLightingEnabled){
     // Ambiental
-    float ambientStrength = 0.5;
+    float ambientStrength = 0.4;
     vec3 ambient = ambientStrength * lightColor;
 
     // Difusa
@@ -50,7 +50,7 @@ void main()
     );
 
     vec3 specular =
-        1 * spec * lightColor;
+        2 * spec * lightColor;
 
     result =
         (ambient + diffuse) * baseColor +

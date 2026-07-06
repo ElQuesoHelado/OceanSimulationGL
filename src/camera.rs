@@ -1,5 +1,4 @@
-use glam::camera::lh::view::look_at_mat4;
-use glam::camera::rh::view;
+use glam::camera::rh::view::look_at_mat4;
 use glam::{Mat4, Vec3};
 
 pub struct Camera {

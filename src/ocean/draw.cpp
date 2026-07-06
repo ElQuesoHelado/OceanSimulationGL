@@ -5,6 +5,9 @@ void Ocean::draw() {
   shader->setFloat("time", time);
 
   glBindVertexArray(VAO);
+
+  glBindTexture(GL_TEXTURE_2D, texture->id);
+
   glDrawElements(
       GL_TRIANGLES,
       indices.size(),

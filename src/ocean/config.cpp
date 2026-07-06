@@ -3,7 +3,6 @@
 void Ocean::createGLObjects() {
   glCreateVertexArrays(1, &VAO);
   glCreateBuffers(1, &VBO);
-  glCreateBuffers(1, &normalsVBO);
   glCreateBuffers(1, &texCoordsVBO);
   glCreateBuffers(1, &EBO);
 }
@@ -15,17 +14,11 @@ void Ocean::setupVAO() {
   glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
   glVertexArrayAttribBinding(VAO, 0, 0);
 
-  // normales
-  glVertexArrayVertexBuffer(VAO, 1, normalsVBO, 0, sizeof(glm::vec3));
-  glEnableVertexArrayAttrib(VAO, 1);
-  glVertexArrayAttribFormat(VAO, 1, 3, GL_FLOAT, GL_FALSE, 0);
-  glVertexArrayAttribBinding(VAO, 1, 1);
-
   // coordenadas UV
-  glVertexArrayVertexBuffer(VAO, 2, texCoordsVBO, 0, sizeof(glm::vec2));
-  glEnableVertexArrayAttrib(VAO, 2);
-  glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 0);
-  glVertexArrayAttribBinding(VAO, 2, 2);
+  glVertexArrayVertexBuffer(VAO, 1, texCoordsVBO, 0, sizeof(glm::vec2));
+  glEnableVertexArrayAttrib(VAO, 1);
+  glVertexArrayAttribFormat(VAO, 1, 2, GL_FLOAT, GL_FALSE, 0);
+  glVertexArrayAttribBinding(VAO, 1, 1);
 }
 
 void Ocean::initialize() {
@@ -58,12 +51,10 @@ void Ocean::destroy() {
     glDeleteVertexArrays(1, &VAO);
   if (VBO)
     glDeleteBuffers(1, &VBO);
-  if (normalsVBO)
-    glDeleteBuffers(1, &normalsVBO);
   if (texCoordsVBO)
     glDeleteBuffers(1, &texCoordsVBO);
   if (EBO)
     glDeleteBuffers(1, &EBO);
 
-  VAO = VBO = normalsVBO = EBO = 0;
+  VAO = VBO = EBO = 0;
 }

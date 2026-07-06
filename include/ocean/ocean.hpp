@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader.hpp"
+#include "Texture.hpp"
 #include <cstddef>
 #include <glad/glad.h>
 #include <glm/ext/vector_float2.hpp>
@@ -20,13 +21,15 @@ struct Ocean {
   std::vector<glm::vec3> points;
   std::vector<Wave> waves;
   std::vector<GLuint> indices;
+  std::vector<glm::vec2> texCoords;
 
   std::unique_ptr<Shader> shader;
+  std::shared_ptr<Texture> texture;
 
-  GLuint VAO{}, VBO{}, normalsVBO{}, texCoordsVBO{}, EBO{};
+  GLuint VAO{}, VBO{}, texCoordsVBO{}, EBO{};
 
-  Ocean(size_t n_points)
-      : npoints(n_points) {
+  Ocean(size_t n_points, const std::shared_ptr<Texture> &tex)
+      : npoints(n_points), texture(tex) {
     points.reserve(n_points);
 
     for (size_t i{}; i < npoints; ++i) {
@@ -53,6 +56,13 @@ struct Ocean {
         indices.push_back(v3);
       }
     }
+
+    texCoords.reserve(n_points * n_points);
+    for (size_t i{}; i < npoints; ++i)
+      for (size_t j{}; j < npoints; ++j)
+        texCoords.emplace_back(
+            float(i) / float(npoints - 1),
+            float(j) / float(npoints - 1));
 
     waves.push_back({0.35f, 0.20f, 0.00f, 0.00f});
     waves.push_back({0.20f, 0.35f, 0.785f, 1.57f});
@@ -83,18 +93,11 @@ struct Ocean {
         points.data(),
         GL_STATIC_DRAW);
 
-    // TODO: normals, textures
-    // glNamedBufferData(
-    //     normalsVBO,
-    //     shape->npoints * 3 * sizeof(float),
-    //     shape->normals,
-    //     GL_STATIC_DRAW);
-    //
-    //   glNamedBufferData(
-    //       texCoordsVBO,
-    //       shape->npoints * 2 * sizeof(float),
-    //       shape->tcoords,
-    //       GL_STATIC_DRAW);
+    glNamedBufferData(
+        texCoordsVBO,
+        texCoords.size() * sizeof(glm::vec2),
+        texCoords.data(),
+        GL_STATIC_DRAW);
 
     glNamedBufferData(
         EBO,

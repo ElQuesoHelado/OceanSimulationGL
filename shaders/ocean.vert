@@ -1,8 +1,7 @@
 #version 460 core
 
 layout(location = 0) in vec3 aPos;
-// layout(location = 1) in vec3 aNormal;
-// layout(location = 2) in vec2 aTexCoord;
+layout(location = 1) in vec2 aTexCoord;
 
 struct Wave
 {
@@ -31,28 +30,40 @@ void main()
   vec3 pos = aPos;
 
   float height = 0.0;
+  float dHdx = 0.0;
+  float dHdz = 0.0;
 
   for(int i = 0; i < waveCount; i++)
   {
-      // float k = (4.0 * 3.14159265 * waves[i].frequency * waves[i].frequency) / 9.81;
       float k = (4.0 * 3.14159265 * 3.14159265 * waves[i].frequency * waves[i].frequency) / 9.81;
+        float dirCos = cos(waves[i].direction);
+        float dirSin = sin(waves[i].direction);
 
-      float theta =
-          k * (pos.x * cos(waves[i].direction)
-              + pos.z * sin(waves[i].direction))
-          - 2.0 * 3.14159265 * waves[i].frequency * time
-          + waves[i].phase;
+        float theta =
+            k * (pos.x * dirCos + pos.z * dirSin)
+            - 2.0 * 3.14159265 * waves[i].frequency * time
+            + waves[i].phase;
 
-      height += waves[i].amplitude * cos(theta);
+        float c = cos(theta);
+        float s = sin(theta);
+
+        height += waves[i].amplitude * c;
+
+        // Formula de vector normal usando derivadas respc (x,z)
+        float dTheta = -waves[i].amplitude * s * k;
+        dHdx += dTheta * dirCos;
+        dHdz += dTheta * dirSin;
   }
 
   pos.y = height*3;
 
   // Normal = aNormal;
-  Normal = vec3(0,1,0);
+  // Normal = vec3(0,1,0);
+  Normal = normalize(vec3(-dHdx, 1.0, -dHdz)); // Formula
   FragPos = pos;
-  // TexCoord = aTexCoord;
-  TexCoord = vec2(1,0);
+  // TexCoord = aPos.xz;
+  // TexCoord = vec2(1,0);
+  TexCoord = aTexCoord;
 
   gl_Position =
       uProjection *

@@ -61,5 +61,5 @@ void main()
 
 
   FragColor = vec4(result, texColor.a);
-  FragColor = vec4(0.0,0.4,1.0,1.0);
+  // FragColor = vec4(0.0,0.4,1.0,1.0);
 }

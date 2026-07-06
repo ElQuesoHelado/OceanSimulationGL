@@ -70,7 +70,8 @@ App::App() {
 
   // Carga de texturas
   load_textures();
-  ocean = std::make_unique<Ocean>(500);
+
+  ocean = std::make_unique<Ocean>(500, texture_manager["ocean"]);
 }
 
 void App::load_textures() {

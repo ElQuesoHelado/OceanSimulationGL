@@ -55,7 +55,7 @@ void main()
         dHdz += dTheta * dirSin;
   }
 
-  pos.y = height*3;
+  pos.y = height*2;
 
   // Normal = aNormal;
   // Normal = vec3(0,1,0);

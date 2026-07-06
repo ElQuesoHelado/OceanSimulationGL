@@ -22,7 +22,7 @@ void App::run() {
     shader->setMat4("uView", camera.view());
 
     // glm::vec3 lightPos(3.0f, 5.0f, 2.0f);
-    glm::vec3 lightPos({20, 20, 30});
+    glm::vec3 lightPos({100, 100, 100});
 
     // glm::vec3 lightPos(15, 20, 15);
 
@@ -47,6 +47,7 @@ void App::run() {
     ocean->shader->setVec3("lightPos", lightPos);
     ocean->shader->setVec3("lightColor", glm::vec3(1));
     ocean->shader->setVec3("viewPos", camera.position());
+    ocean->shader->setFloat("shininess", 256.0f);
     ocean->draw();
 
     //

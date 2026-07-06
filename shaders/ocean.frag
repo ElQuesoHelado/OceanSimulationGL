@@ -28,7 +28,7 @@ void main()
 
   if(uLightingEnabled){
     // Ambiental
-    float ambientStrength = 0.4;
+    float ambientStrength = 0.5;
     vec3 ambient = ambientStrength * lightColor;
 
     // Difusa
@@ -50,7 +50,7 @@ void main()
     );
 
     vec3 specular =
-        2 * spec * lightColor;
+        1 * spec * lightColor;
 
     result =
         (ambient + diffuse) * baseColor +
@@ -61,5 +61,4 @@ void main()
 
 
   FragColor = vec4(result, texColor.a);
-  // FragColor = vec4(0.0,0.4,1.0,1.0);
 }

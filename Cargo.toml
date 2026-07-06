@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+bytemuck = "1.25.0"
 dear-imgui-rs = "0.15.1"
 glam = "0.33.2"
 glow = "0.17.0"

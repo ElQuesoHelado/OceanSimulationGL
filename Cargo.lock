@@ -198,6 +198,7 @@ dependencies = [
 name = "base3DR"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "dear-imgui-rs",
  "glam",
  "glow",

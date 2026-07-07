@@ -1,4 +1,4 @@
-use glam::{Mat4, Vec3};
+use glam::{Mat4, Vec3, Vec4};
 use std::fs;
 use std::io;
 use std::result::Result;
@@ -59,6 +59,13 @@ impl Shader {
         unsafe {
             let location = gl.get_uniform_location(self.program, name);
             gl.uniform_3_f32_slice(location.as_ref(), &value.to_array());
+        }
+    }
+
+    pub fn set_vec4(&self, gl: &glow::Context, name: &str, value: Vec4) {
+        unsafe {
+            let location = gl.get_uniform_location(self.program, name);
+            gl.uniform_4_f32_slice(location.as_ref(), &value.to_array());
         }
     }
 

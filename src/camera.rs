@@ -1,36 +1,46 @@
 use glam::camera::rh::view::look_at_mat4;
 use glam::{Mat4, Vec3};
 
+//Todo en Rads
 pub struct Camera {
     pub target: Vec3,
     pub distance: f32,
     pub yaw: f32,
     pub pitch: f32,
+    pub fov_v: f32,
+    pub aspect: f32,
+    pub near: f32,
+    pub far: f32,
 }
 
 impl Camera {
-    pub fn new() -> Self {
+    pub fn new(aspect: f32) -> Self {
         Self {
             target: Vec3::new(0., 0., 0.),
-            distance: 50.,
-            yaw: 45.,
-            pitch: 20.,
+            distance: 5.,
+            yaw: 0.0,
+            pitch: 0.3,
+            fov_v: 60f32.to_radians(),
+            aspect,
+            near: 0.05,
+            far: 500.0,
         }
     }
 
-    pub fn position(&self) -> Vec3 {
-        let ry = self.yaw.to_radians();
-        let rp = self.pitch.to_radians();
-
+    pub fn eye(&self) -> Vec3 {
         Vec3::new(
-            self.target.x + self.distance * rp.cos() * ry.cos(),
-            self.target.y + self.distance * rp.cos(),
-            self.target.z + self.distance * rp.cos() * ry.sin(),
+            self.target.x + self.distance * self.pitch.cos() * self.yaw.cos(),
+            self.target.y + self.distance * self.pitch.cos(),
+            self.target.z + self.distance * self.pitch.cos() * self.yaw.sin(),
         )
     }
 
     pub fn view(&self) -> Mat4 {
-        look_at_mat4(self.position(), self.target, Vec3::new(0., 1., 0.))
+        look_at_mat4(self.eye(), self.target, Vec3::Y)
+    }
+
+    pub fn projection(&self) -> Mat4 {
+        glam::camera::rh::proj::opengl::perspective(self.fov_v, self.aspect, self.near, self.far)
     }
 
     pub fn orbit(&mut self, dx: f32, dy: f32) {
@@ -46,7 +56,7 @@ impl Camera {
     }
 
     pub fn pan(&mut self, dx: f32, dy: f32) {
-        let forward = (self.target - self.position()).normalize();
+        let forward = (self.target - self.eye()).normalize();
         let right = (forward.cross(Vec3::new(0., 1., 0.))).normalize();
         let up = right.cross(forward).normalize();
 
@@ -54,5 +64,11 @@ impl Camera {
 
         self.target -= right * dx * speed;
         self.target += up * dy * speed;
+    }
+
+    pub fn set_aspect(&mut self, width: f32, height: f32) {
+        if height > 0.0 {
+            self.aspect = width / height;
+        }
     }
 }

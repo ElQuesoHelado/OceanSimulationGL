@@ -4,6 +4,7 @@ mod ejemplo;
 mod figures;
 mod gizmo;
 mod light;
+mod material;
 mod mesh;
 mod mops;
 mod renderer;

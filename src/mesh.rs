@@ -1,14 +1,47 @@
 use glow::HasContext;
 
+use crate::figures;
+
+pub enum MeshId {
+    Cube,
+    Cone,
+    Cylinder,
+    Klein,
+    Pen,
+    Rock,
+    Sphere,
+    Tetrahedron,
+    Torus,
+}
+
 // Duenia de todos los meshes base
-// TODO: ?Alguna funcion ayudante?
 pub struct MeshLibrary {
     meshes: Vec<Mesh>,
 }
 
 impl MeshLibrary {
-    pub fn add(&mut self, gl: &glow::Context, data: &MeshData) {
+    pub fn new(gl: &glow::Context) -> Self {
+        let meshes: Vec<Mesh> = vec![
+            Mesh::upload(gl, figures::cube()),
+            Mesh::upload(gl, figures::cone()),
+            Mesh::upload(gl, figures::cylinder()),
+            Mesh::upload(gl, figures::klein()),
+            Mesh::upload(gl, figures::pen()),
+            Mesh::upload(gl, figures::rock()),
+            Mesh::upload(gl, figures::sphere()),
+            Mesh::upload(gl, figures::tetrahedron()),
+            Mesh::upload(gl, figures::torus()),
+        ];
+
+        Self { meshes }
+    }
+
+    pub fn add(&mut self, gl: &glow::Context, data: MeshData) {
         self.meshes.push(Mesh::upload(gl, data));
+    }
+
+    pub fn get(&self, id: MeshId) -> Option<&Mesh> {
+        self.meshes.get(id as usize)
     }
 }
 
@@ -31,7 +64,7 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn upload(gl: &glow::Context, data: &MeshData) -> Self {
+    pub fn upload(gl: &glow::Context, data: MeshData) -> Self {
         unsafe {
             let vao = gl.create_vertex_array().unwrap();
             let vbo_positions = gl.create_buffer().unwrap();

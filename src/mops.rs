@@ -1,10 +1,10 @@
 use glam::{Mat4, Vec3};
 
-pub struct MOps {
+pub struct Transform {
     mat: Mat4,
 }
 
-impl MOps {
+impl Transform {
     pub fn new() -> Self {
         Self {
             mat: Mat4::IDENTITY,

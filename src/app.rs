@@ -2,6 +2,8 @@ use std::error::Error;
 use std::ffi::CString;
 use std::num::NonZeroU32;
 
+use glam::{Vec3, Vec4, vec3, vec4};
+use glow::HasContext;
 use raw_window_handle::HasWindowHandle;
 use winit::application::ApplicationHandler;
 use winit::event::{KeyEvent, WindowEvent};
@@ -17,12 +19,15 @@ use glutin::surface::{Surface, SwapInterval, WindowSurface};
 use glutin_winit::{DisplayBuilder, GlWindow};
 
 use crate::camera::Camera;
-use crate::figures;
 use crate::gizmo::Gizmo;
-use crate::mesh::{self, MeshLibrary};
+use crate::light::Light;
+use crate::material::Material;
+use crate::mesh::{self, MeshId, MeshLibrary};
+use crate::mops::Transform;
 use crate::renderer::StandardRenderer;
 use crate::scene::{Instance, Scene};
 use crate::texture::TextureLibrary;
+use crate::{figures, scene};
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let event_loop = winit::event_loop::EventLoop::new()?;
@@ -34,16 +39,37 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     app.exit_state
 }
 
-//Necesario separar en state, esto por comportamiento de winit
+struct GraphicsContext {
+    gl: glow::Context,
+    mesh_library: MeshLibrary,
+    texture_library: TextureLibrary,
+}
+
+impl GraphicsContext {
+    pub fn resize(&self, width: i32, height: i32) {
+        unsafe { self.gl.viewport(0, 0, width, height) };
+    }
+
+    pub fn clear(&self) {
+        unsafe {
+            self.gl.clear_color(0.08, 0.08, 0.09, 1.0);
+            self.gl
+                .clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
+        }
+    }
+}
+
+// Necesario separar en state, esto por comportamiento de winit
 struct AppState {
     window: Window,
     gl_context: PossiblyCurrentContext,
     gl_surface: Surface<WindowSurface>,
     standard_renderer: StandardRenderer,
+    ctx: GraphicsContext,
     scene: Scene,
     camera: Camera,
     gizmo: Gizmo,
-    texture_library: TextureLibrary,
+    light: Light,
 }
 
 struct App {
@@ -120,35 +146,48 @@ impl ApplicationHandler for App {
             eprintln!("No se pudo activar vsync: {err:?}");
         }
 
-        let mut renderer = StandardRenderer::new(
+        let standard_renderer = StandardRenderer::new(
             &gl,
             "assets/shaders/shader.vert",
             "assets/shaders/shader.vert",
-        );
-        // let gizmo = Gizmo::new(&renderer.gl);
+        )
+        .expect("Creacion de Renderer Fallida");
 
-        // --- Escena de ejemplo: un cubo con material de color plano ---
-        let mut mesh_library: MeshLibrary;
-        mesh_library.add(&gl, &figures::cube());
+        let gizmo = Gizmo::new(&gl);
+
+        let mesh_library = MeshLibrary::new(&gl);
+        let texture_library = TextureLibrary::new(&gl, "assets/textures");
 
         let mut scene = Scene::new();
-        let idx = scene.add(Instance {
-            transform: glam::Mat4::IDENTITY,
-            mesh: cube_mesh,
-            material: red_material,
-        });
-        scene.selected = Some(idx);
 
-        let camera = Camera::new();
+        let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "blank")
+            .expect("Textura no encontrada");
+
+        scene.add_prim_instance(Instance::new(MeshId::Cube, material));
+
+        let size = window.inner_size();
+        let camera = Camera::new(size.width as f32 / size.height as f32);
+
+        let light = Light {
+            enabled: true,
+            pos: vec3(1f32, 1f32, 1f32),
+            color: vec3(1f32, 1f32, 1f32),
+        };
 
         self.state = Some(AppState {
             window,
             gl_context,
             gl_surface,
-            renderer,
+            standard_renderer,
+            ctx: GraphicsContext {
+                gl,
+                mesh_library,
+                texture_library,
+            },
             scene,
             camera,
             gizmo,
+            light,
         });
     }
 
@@ -164,7 +203,7 @@ impl ApplicationHandler for App {
                     NonZeroU32::new(size.width).unwrap(),
                     NonZeroU32::new(size.height).unwrap(),
                 );
-                state.renderer.resize(size.width as i32, size.height as i32);
+                state.ctx.resize(size.width as i32, size.height as i32);
                 state
                     .camera
                     .set_aspect(size.width as f32, size.height as f32);
@@ -187,15 +226,22 @@ impl ApplicationHandler for App {
             return;
         };
 
-        state.renderer.clear();
-        state.renderer.draw_scene(&state.scene, &state.camera);
+        state.ctx.clear();
+        state.standard_renderer.draw(
+            &state.ctx.gl,
+            &state.scene.prim_instances,
+            &state.camera,
+            &state.light,
+        );
 
-        if let Some(idx) = state.scene.selected {
-            let world_pos = state.scene.instances[idx].transform.w_axis.truncate();
-            state
-                .gizmo
-                .draw(&state.renderer.gl, &state.camera, world_pos);
-        }
+        // state.ctx.draw_scene(&state.scene, &state.camera);
+
+        // if let Some(idx) = state.scene.selected {
+        //     let world_pos = state.scene.instances[idx].transform.w_axis.truncate();
+        //     state
+        //         .gizmo
+        //         .draw(&state.renderer.gl, &state.camera, world_pos);
+        // }
 
         state.window.request_redraw();
         state.gl_surface.swap_buffers(&state.gl_context).unwrap();

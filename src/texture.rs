@@ -8,11 +8,34 @@ pub struct TextureLibrary {
 }
 
 impl TextureLibrary {
-    pub fn populate_from_folder(&mut self, gl: &glow::Context, path: &str) -> Result<(), String> {
-        for entry in fs::read_dir(path).map_err(|e| e.to_string())? {
-            let entry = entry.map_err(|e| e.to_string())?;
+    pub fn get_id_from_name(&self, name: &str) -> Option<u32> {
+        self.names.get(name).copied()
+    }
 
-            if !entry.file_type().map_err(|e| e.to_string())?.is_file() {
+    pub fn get_texture_from_id(&self, id: u32) -> Option<&Texture> {
+        self.textures.get(&id)
+    }
+
+    pub fn get_texture_from_name(&self, name: &str) -> Option<&Texture> {
+        self.get_texture_from_id(self.get_id_from_name(name)?)
+    }
+
+    pub fn new(gl: &glow::Context, path: &str) -> Self {
+        let mut names: HashMap<String, u32> = HashMap::new();
+        let mut textures: HashMap<u32, Texture> = HashMap::new();
+
+        let entries = match fs::read_dir(path) {
+            Ok(entries) => entries,
+            Err(_) => return Self { names, textures },
+        };
+
+        for entry in entries {
+            let entry = match entry {
+                Ok(entry) => entry,
+                Err(_) => continue,
+            };
+
+            if !entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
                 continue;
             }
 
@@ -25,16 +48,16 @@ impl TextureLibrary {
 
             match Texture::new(gl, path) {
                 Ok(texture) => {
-                    let len_map = self.textures.len() as u32;
-                    self.textures.insert(len_map, texture);
-                    self.names.insert(name, len_map);
+                    let len_map = textures.len() as u32;
+                    textures.insert(len_map, texture);
+                    names.insert(name, len_map);
                 }
                 Err(_) => {
                     continue;
                 }
             }
         }
-        Ok(())
+        Self { names, textures }
     }
 }
 

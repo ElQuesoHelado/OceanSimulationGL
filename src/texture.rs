@@ -1,4 +1,42 @@
 use glow::HasContext;
+use std::io;
+use std::{collections::HashMap, fs};
+
+pub struct TextureLibrary {
+    names: HashMap<String, u32>,
+    textures: HashMap<u32, Texture>, // u32 como Ids
+}
+
+impl TextureLibrary {
+    pub fn populate_from_folder(&mut self, gl: &glow::Context, path: &str) -> Result<(), String> {
+        for entry in fs::read_dir(path).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+
+            if !entry.file_type().map_err(|e| e.to_string())?.is_file() {
+                continue;
+            }
+
+            let name = entry
+                .path()
+                .file_stem()
+                .unwrap()
+                .to_string_lossy()
+                .into_owned();
+
+            match Texture::new(gl, path) {
+                Ok(texture) => {
+                    let len_map = self.textures.len() as u32;
+                    self.textures.insert(len_map, texture);
+                    self.names.insert(name, len_map);
+                }
+                Err(_) => {
+                    continue;
+                }
+            }
+        }
+        Ok(())
+    }
+}
 
 pub struct Texture {
     id: glow::Texture,

@@ -7,3 +7,5 @@ pub struct Instance {
     pub shininess: f32,
     pub texture: glow::Texture,
 }
+
+pub struct Scene {}

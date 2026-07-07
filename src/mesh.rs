@@ -1,5 +1,18 @@
 use glow::HasContext;
 
+// Duenia de todos los meshes base
+// TODO: ?Alguna funcion ayudante?
+pub struct MeshLibrary {
+    meshes: Vec<Mesh>,
+}
+
+impl MeshLibrary {
+    pub fn add(&mut self, gl: &glow::Context, data: &MeshData) {
+        self.meshes.push(Mesh::upload(gl, data));
+    }
+}
+
+// Datos crudos de un mesh(Cube, Sphere, ...)
 pub struct MeshData {
     pub positions: &'static [[f32; 3]],
     pub normals: &'static [[f32; 3]],
@@ -7,6 +20,7 @@ pub struct MeshData {
     pub indices: &'static [u32],
 }
 
+// Mesh cargado
 pub struct Mesh {
     vao: glow::VertexArray,
     vbo_positions: glow::Buffer,

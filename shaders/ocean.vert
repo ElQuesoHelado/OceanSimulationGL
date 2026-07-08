@@ -36,23 +36,23 @@ void main()
   for(int i = 0; i < waveCount; i++)
   {
       float k = (4.0 * 3.14159265 * 3.14159265 * waves[i].frequency * waves[i].frequency) / 9.81;
-        float dirCos = cos(waves[i].direction);
-        float dirSin = sin(waves[i].direction);
+      float dirCos = cos(waves[i].direction);
+      float dirSin = sin(waves[i].direction);
 
-        float theta =
-            k * (pos.x * dirCos + pos.z * dirSin)
-            - 2.0 * 3.14159265 * waves[i].frequency * time
-            + waves[i].phase;
+      float theta =
+          k * (pos.x * dirCos + pos.z * dirSin)
+          - 2.0 * 3.14159265 * waves[i].frequency * time
+          + waves[i].phase;
 
-        float c = cos(theta);
-        float s = sin(theta);
+      float c = cos(theta);
+      float s = sin(theta);
 
-        height += waves[i].amplitude * c;
+      height += waves[i].amplitude * c;
 
-        // Formula de vector normal usando derivadas respc (x,z)
-        float dTheta = -waves[i].amplitude * s * k;
-        dHdx += dTheta * dirCos;
-        dHdz += dTheta * dirSin;
+      // Formula de vector normal usando derivadas respc (x,z)
+      float dTheta = -waves[i].amplitude * s * k;
+      dHdx += dTheta * dirCos;
+      dHdz += dTheta * dirSin;
   }
 
   pos.y = height*8;

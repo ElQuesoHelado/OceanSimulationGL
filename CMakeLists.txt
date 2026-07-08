@@ -27,8 +27,7 @@ add_executable(app
 
 target_include_directories(app PRIVATE
         glad/include
-        include
-        /usr/include/stb)
+        include)
 
 target_link_libraries(app glfw OpenGL::GL glm::glm imgui)
 

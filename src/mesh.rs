@@ -13,6 +13,7 @@ pub enum MeshId {
     Sphere,
     Tetrahedron,
     Torus,
+    Billboard,
 }
 
 // Duenia de todos los meshes base
@@ -32,6 +33,7 @@ impl MeshLibrary {
             Mesh::upload(gl, figures::sphere()),
             Mesh::upload(gl, figures::tetrahedron()),
             Mesh::upload(gl, figures::torus()),
+            Mesh::upload(gl, figures::billboard()),
         ];
 
         Self { meshes }
@@ -124,16 +126,6 @@ impl Mesh {
             gl.vertex_array_attrib_binding_f32(vao, 2, 2);
 
             gl.vertex_array_element_buffer(vao, Some(ebo));
-
-            // println!(
-            //     "positions: {}, normals: {}, texcoords: {}, indices: {}, max_index: {}",
-            //     data.positions.len(),
-            //     data.normals.len(),
-            //     data.texcoords.len(),
-            //     data.indices.len(),
-            //     data.indices.iter().copied().max().unwrap_or(0),
-            // );
-
             Self {
                 vao,
                 vbo_positions,

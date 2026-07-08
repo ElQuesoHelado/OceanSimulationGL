@@ -4,10 +4,17 @@ project(paint)
 
 set(CMAKE_CXX_STANDARD 23)
 
-find_package(glfw3 REQUIRED)
+if(DEFINED VCPKG_TOOLCHAIN)
+  find_package(glfw3 CONFIG REQUIRED)
+  find_package(glm CONFIG REQUIRED)
+  find_package(imgui CONFIG REQUIRED)
+else()
+  find_package(glfw3 REQUIRED)
+  find_package(glm REQUIRED)
+  find_package(imgui REQUIRED)
+endif()
+
 find_package(OpenGL REQUIRED)
-find_package(glm REQUIRED)
-find_package(imgui REQUIRED)
 
 add_executable(app
     main.cpp

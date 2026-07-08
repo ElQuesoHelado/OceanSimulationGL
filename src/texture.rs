@@ -77,7 +77,8 @@ impl Texture {
     pub fn new(gl: &glow::Context, path: &str) -> Result<Self, String> {
         // println!("{}", path);
         let img = image::open(path).map_err(|e| e.to_string())?;
-        let rgba = img.flipv().into_rgba8();
+        //let rgba = img.flipv().into_rgba8();
+        let rgba = img.into_rgba8();
 
         let (width, height) = rgba.dimensions();
 

@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use glam::camera::rh::view::look_at_mat4;
 use glam::{Mat4, Vec3};
 
@@ -20,7 +22,7 @@ impl Camera {
             distance: 5.,
             yaw: 0.0,
             pitch: 0.3,
-            fov_v: 60f32.to_radians(),
+            fov_v: 90f32.to_radians(),
             aspect,
             near: 0.05,
             far: 500.0,
@@ -30,7 +32,7 @@ impl Camera {
     pub fn eye(&self) -> Vec3 {
         Vec3::new(
             self.target.x + self.distance * self.pitch.cos() * self.yaw.cos(),
-            self.target.y + self.distance * self.pitch.cos(),
+            self.target.y + self.distance * self.pitch.sin(),
             self.target.z + self.distance * self.pitch.cos() * self.yaw.sin(),
         )
     }
@@ -47,7 +49,7 @@ impl Camera {
         self.yaw += dx * 0.3;
         self.pitch += dy * 0.3;
 
-        self.pitch = self.pitch.clamp(-89., 89.);
+        self.pitch = self.pitch.clamp(-PI / 2.1f32, PI / 2.1f32);
     }
 
     pub fn zoom(&mut self, delta: f32) {

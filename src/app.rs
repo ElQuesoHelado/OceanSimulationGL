@@ -25,7 +25,8 @@ use crate::light::Light;
 use crate::material::Material;
 use crate::mesh::{self, MeshId, MeshLibrary};
 use crate::mops::Transform;
-use crate::renderer::StandardRenderer;
+use crate::rain::Rain;
+use crate::renderer::{BillboardRenderer, StandardRenderer};
 use crate::scene::{Instance, Scene};
 use crate::texture::TextureLibrary;
 use crate::{figures, scene};
@@ -53,7 +54,7 @@ impl GraphicsContext {
 
     pub fn clear(&self) {
         unsafe {
-            self.gl.clear_color(0.08, 0.08, 0.09, 1.0);
+            self.gl.clear_color(0.2, 0.2, 0.2, 1.0);
             self.gl
                 .clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
@@ -66,12 +67,14 @@ struct AppState {
     gl_context: PossiblyCurrentContext,
     gl_surface: Surface<WindowSurface>,
     standard_renderer: StandardRenderer,
+    billboard_renderer: BillboardRenderer,
     ctx: GraphicsContext,
     scene: Scene,
     input: InputState,
     camera: Camera,
     gizmo: Gizmo,
     light: Light,
+    rain: Rain,
 }
 
 impl AppState {
@@ -83,7 +86,7 @@ impl AppState {
         if alt && left_pressed {
             self.camera.orbit(
                 self.input.mouse_dx as f32 * 0.1,
-                -self.input.mouse_dy as f32 * 0.1,
+                self.input.mouse_dy as f32 * 0.1,
             );
             return;
         } else if shift && left_pressed {
@@ -182,7 +185,14 @@ impl ApplicationHandler for App {
             "assets/shaders/shader.vert",
             "assets/shaders/shader.frag",
         )
-        .expect("Creacion de Renderer Fallida");
+        .expect("Creacion de Renderer Standard fallida");
+
+        let billboard_renderer = BillboardRenderer::new(
+            &gl,
+            "assets/shaders/billboard.vert",
+            "assets/shaders/billboard.frag",
+        )
+        .expect("Creacion de Renderer Billboard fallida");
 
         let gizmo = Gizmo::new(&gl);
 
@@ -191,10 +201,10 @@ impl ApplicationHandler for App {
 
         let mut scene = Scene::new();
 
-        let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "brick")
+        let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "hinojosa")
             .expect("Textura no encontrada"); //TODO: en UI no hacer panic?
 
-        scene.add_prim_instance(Instance::new(MeshId::Sphere, material));
+        scene.add_prim_instance(Instance::new(MeshId::Cube, material));
 
         let size = window.inner_size();
         let camera = Camera::new(size.width as f32 / size.height as f32);
@@ -205,11 +215,14 @@ impl ApplicationHandler for App {
             color: vec3(1f32, 1f32, 1f32),
         };
 
+        let rain = Rain::new(&mut scene, &texture_library, 200);
+
         self.state = Some(AppState {
             window,
             gl_context,
             gl_surface,
             standard_renderer,
+            billboard_renderer,
             ctx: GraphicsContext {
                 gl,
                 mesh_library,
@@ -220,6 +233,7 @@ impl ApplicationHandler for App {
             camera,
             gizmo,
             light,
+            rain,
         });
     }
 
@@ -276,6 +290,8 @@ impl ApplicationHandler for App {
             return;
         };
 
+        state.rain.update(&mut state.scene, 0.11f32);
+
         state.process_input();
         state.input.end_frame();
 
@@ -286,6 +302,10 @@ impl ApplicationHandler for App {
             &state.camera,
             &state.light,
         );
+
+        state
+            .billboard_renderer
+            .draw(&state.ctx, &state.scene.bill_instances, &state.camera);
 
         // if let Some(idx) = state.scene.selected {
         //     let world_pos = state.scene.instances[idx].transform.w_axis.truncate();

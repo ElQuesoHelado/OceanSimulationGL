@@ -115,7 +115,7 @@ impl BillboardRenderer {
         }
 
         unsafe {
-            gl.disable(glow::BLEND);
+            // gl.disable(glow::BLEND);
         }
     }
 }

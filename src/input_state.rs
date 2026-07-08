@@ -22,7 +22,6 @@ impl InputState {
         self.mouse_buttons_down.contains(&button)
     }
 
-    /// Llamar UNA vez por frame, después de procesar input, para resetear el delta.
     pub fn end_frame(&mut self) {
         self.mouse_dx = 0.0;
         self.mouse_dy = 0.0;

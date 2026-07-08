@@ -27,11 +27,15 @@ impl Rain {
         for _ in 0..n_drops {
             let mut transform = Transform::new();
 
-            transform.trans(vec3(
-                rng.random_range(0.0..10.0),
-                rng.random_range(2.0..8.0),
-                rng.random_range(0.0..10.0),
-            ));
+            transform
+                .trans(vec3(
+                    rng.random_range(-20.0..20.0),
+                    rng.random_range(2.0..30.0),
+                    rng.random_range(-20.0..20.0),
+                ))
+                .scale(vec3(0.1, 0.8, 1.0));
+
+            //transform.trans(vec3(0.0, 0.0, 0.0));
 
             let id = scene.add_bill_instance_trans(transform, texture_library);
 
@@ -54,9 +58,9 @@ impl Rain {
 
             if instance.transform.position().y <= 0.0 {
                 instance.transform.set_position(vec3(
-                    rng.random_range(0.0..10.0),
-                    rng.random_range(5.0..8.0),
-                    rng.random_range(0.0..10.0),
+                    rng.random_range(-20.0..20.0),
+                    rng.random_range(2.0..30.0),
+                    rng.random_range(-20.0..20.0),
                 ));
             }
         }

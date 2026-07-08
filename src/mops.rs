@@ -35,4 +35,15 @@ impl Transform {
         self.mat *= Mat4::from_translation(t);
         self
     }
+
+    pub fn position(&self) -> Vec3 {
+        self.mat.w_axis.truncate()
+    }
+
+    pub fn set_position(&mut self, position: Vec3) -> &Self {
+        self.mat.w_axis.x = position.x;
+        self.mat.w_axis.y = position.y;
+        self.mat.w_axis.z = position.z;
+        self
+    }
 }

@@ -8,6 +8,7 @@ mod light;
 mod material;
 mod mesh;
 mod mops;
+mod rain;
 mod renderer;
 mod scene;
 mod shader;

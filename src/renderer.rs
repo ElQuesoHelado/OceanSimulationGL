@@ -13,6 +13,9 @@ pub struct StandardRenderer {
 impl StandardRenderer {
     pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
         let shader = Shader::new(gl, vertex_path, frag_path)?;
+        shader.activate(gl);
+        shader.set_int(gl, "uTexture", 0);
+
         Ok(Self { shader })
     }
 
@@ -54,6 +57,65 @@ impl StandardRenderer {
                 Some(v) => v.draw(gl),
                 None => continue,
             };
+        }
+    }
+}
+
+pub struct BillboardRenderer {
+    shader: Shader,
+}
+
+impl BillboardRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        let shader = Shader::new(gl, vertex_path, frag_path)?;
+
+        shader.activate(gl);
+        shader.set_int(gl, "uTexture", 0);
+
+        Ok(Self { shader })
+    }
+
+    pub fn draw(&self, ctx: &GraphicsContext, instances: &[Instance], camera: &Camera) {
+        let gl = &ctx.gl;
+
+        self.shader.activate(gl);
+
+        self.shader.set_mat4(gl, "uView", &camera.view());
+
+        self.shader
+            .set_mat4(gl, "uProjection", &camera.projection());
+
+        unsafe {
+            gl.enable(glow::BLEND);
+            gl.blend_func(glow::SRC_ALPHA, glow::ONE_MINUS_SRC_ALPHA);
+
+            // Seguimos usando el depth buffer
+            gl.depth_mask(true);
+        }
+
+        for inst in instances {
+            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+
+            self.shader.set_vec4(gl, "uColor", &inst.material.color);
+
+            unsafe {
+                gl.active_texture(glow::TEXTURE0);
+
+                gl.bind_texture(
+                    glow::TEXTURE_2D,
+                    ctx.texture_library
+                        .get_texture_from_id(inst.material.texture_id)
+                        .map(|tex| tex.id),
+                );
+            }
+
+            if let Some(mesh) = ctx.mesh_library.get(inst.mesh_id) {
+                mesh.draw(gl);
+            }
+        }
+
+        unsafe {
+            gl.disable(glow::BLEND);
         }
     }
 }

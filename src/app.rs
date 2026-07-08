@@ -39,10 +39,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     app.exit_state
 }
 
-struct GraphicsContext {
-    gl: glow::Context,
-    mesh_library: MeshLibrary,
-    texture_library: TextureLibrary,
+pub struct GraphicsContext {
+    pub gl: glow::Context,
+    pub mesh_library: MeshLibrary,
+    pub texture_library: TextureLibrary,
 }
 
 impl GraphicsContext {
@@ -115,6 +115,7 @@ impl ApplicationHandler for App {
 
         let context_attributes = ContextAttributesBuilder::new()
             .with_context_api(ContextApi::OpenGl(Some(Version::new(4, 6))))
+            .with_debug(true)
             .build(raw_window_handle);
 
         let not_current_context = unsafe {
@@ -134,11 +135,19 @@ impl ApplicationHandler for App {
 
         let gl_context = not_current_context.make_current(&gl_surface).unwrap();
 
-        let gl = unsafe {
+        let mut gl = unsafe {
             glow::Context::from_loader_function(|s| {
                 gl_display.get_proc_address(&CString::new(s).unwrap()) as *const _
             })
         };
+
+        unsafe {
+            gl.enable(glow::DEBUG_OUTPUT);
+            gl.enable(glow::DEBUG_OUTPUT_SYNCHRONOUS);
+            gl.debug_message_callback(|_source, _typ, _id, _severity, message| {
+                eprintln!("GL DEBUG: {}", message);
+            });
+        }
 
         if let Err(err) = gl_surface
             .set_swap_interval(&gl_context, SwapInterval::Wait(NonZeroU32::new(1).unwrap()))
@@ -149,7 +158,7 @@ impl ApplicationHandler for App {
         let standard_renderer = StandardRenderer::new(
             &gl,
             "assets/shaders/shader.vert",
-            "assets/shaders/shader.vert",
+            "assets/shaders/shader.frag",
         )
         .expect("Creacion de Renderer Fallida");
 
@@ -160,10 +169,10 @@ impl ApplicationHandler for App {
 
         let mut scene = Scene::new();
 
-        let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "blank")
-            .expect("Textura no encontrada");
+        let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "brick")
+            .expect("Textura no encontrada"); //TODO: en UI no hacer panic?
 
-        scene.add_prim_instance(Instance::new(MeshId::Cube, material));
+        scene.add_prim_instance(Instance::new(MeshId::Sphere, material));
 
         let size = window.inner_size();
         let camera = Camera::new(size.width as f32 / size.height as f32);
@@ -228,13 +237,11 @@ impl ApplicationHandler for App {
 
         state.ctx.clear();
         state.standard_renderer.draw(
-            &state.ctx.gl,
+            &state.ctx,
             &state.scene.prim_instances,
             &state.camera,
             &state.light,
         );
-
-        // state.ctx.draw_scene(&state.scene, &state.camera);
 
         // if let Some(idx) = state.scene.selected {
         //     let world_pos = state.scene.instances[idx].transform.w_axis.truncate();

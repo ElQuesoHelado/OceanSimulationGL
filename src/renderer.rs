@@ -1,6 +1,10 @@
 use glam::{Mat4, Vec3, camera};
+use glow::HasContext;
 
-use crate::{camera::Camera, light::Light, mesh::MeshLibrary, scene::Instance, shader::Shader};
+use crate::{
+    app::GraphicsContext, camera::Camera, light::Light, mesh::MeshLibrary, scene::Instance,
+    shader::Shader,
+};
 
 // Figuras 3D
 pub struct StandardRenderer {
@@ -12,22 +16,44 @@ impl StandardRenderer {
         Ok(Self { shader })
     }
 
-    pub fn draw(&self, gl: &glow::Context, instances: &[Instance], camera: &Camera, light: &Light) {
+    pub fn draw(
+        &self,
+        ctx: &GraphicsContext,
+        instances: &[Instance],
+        camera: &Camera,
+        light: &Light,
+    ) {
+        let gl = &ctx.gl;
+
         self.shader.activate(gl);
         self.shader.set_mat4(gl, "uView", &camera.view());
         self.shader
             .set_mat4(gl, "uProjection", &camera.projection());
         self.shader.set_bool(gl, "uLightingEnabled", light.enabled);
-        self.shader.set_vec3(gl, "uLightPos", light.pos);
-        self.shader.set_vec3(gl, "uLightColor", light.color);
-        self.shader.set_vec3(gl, "uEye", camera.eye());
+        self.shader.set_vec3(gl, "uLightPos", &light.pos);
+        self.shader.set_vec3(gl, "uLightColor", &light.color);
+        self.shader.set_vec3(gl, "uEye", &camera.eye());
 
         for inst in instances {
-            self.shader.set_vec4(gl, "uColor", inst.material.color);
+            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_vec4(gl, "uColor", &inst.material.color);
             self.shader
                 .set_float(gl, "uShininess", inst.material.shininess);
-            //FIXME: Pasar transform de primitive
-            //inst.draw();
+
+            unsafe {
+                gl.active_texture(glow::TEXTURE0);
+                gl.bind_texture(
+                    glow::TEXTURE_2D,
+                    ctx.texture_library
+                        .get_texture_from_id(inst.material.texture_id)
+                        .map(|tex| tex.id),
+                );
+            }
+
+            match ctx.mesh_library.get(inst.mesh_id) {
+                Some(v) => v.draw(gl),
+                None => continue,
+            };
         }
     }
 }

@@ -3,8 +3,8 @@ use std::io;
 use std::{collections::HashMap, fs};
 
 pub struct TextureLibrary {
-    names: HashMap<String, u32>,
-    textures: HashMap<u32, Texture>, // u32 como Ids
+    pub names: HashMap<String, u32>,
+    pub textures: HashMap<u32, Texture>, // u32 como Ids
 }
 
 impl TextureLibrary {
@@ -20,11 +20,11 @@ impl TextureLibrary {
         self.get_texture_from_id(self.get_id_from_name(name)?)
     }
 
-    pub fn new(gl: &glow::Context, path: &str) -> Self {
+    pub fn new(gl: &glow::Context, dir_path: &str) -> Self {
         let mut names: HashMap<String, u32> = HashMap::new();
         let mut textures: HashMap<u32, Texture> = HashMap::new();
 
-        let entries = match fs::read_dir(path) {
+        let entries = match fs::read_dir(dir_path) {
             Ok(entries) => entries,
             Err(_) => return Self { names, textures },
         };
@@ -39,6 +39,7 @@ impl TextureLibrary {
                 continue;
             }
 
+            let path = entry.path().to_string_lossy().to_string();
             let name = entry
                 .path()
                 .file_stem()
@@ -46,13 +47,16 @@ impl TextureLibrary {
                 .to_string_lossy()
                 .into_owned();
 
-            match Texture::new(gl, path) {
+            // println!("{}", &entry.path().to_string_lossy());
+
+            match Texture::new(gl, &path) {
                 Ok(texture) => {
                     let len_map = textures.len() as u32;
                     textures.insert(len_map, texture);
                     names.insert(name, len_map);
                 }
-                Err(_) => {
+                Err(e) => {
+                    println!("{}", e);
                     continue;
                 }
             }
@@ -62,15 +66,16 @@ impl TextureLibrary {
 }
 
 pub struct Texture {
-    id: glow::Texture,
-    width: i32,
-    height: i32,
-    channels: i32,
-    path: String,
+    pub id: glow::Texture,
+    pub width: i32,
+    pub height: i32,
+    pub channels: i32,
+    pub path: String,
 }
 
 impl Texture {
     pub fn new(gl: &glow::Context, path: &str) -> Result<Self, String> {
+        // println!("{}", path);
         let img = image::open(path).map_err(|e| e.to_string())?;
         let rgba = img.flipv().into_rgba8();
 
@@ -78,6 +83,8 @@ impl Texture {
 
         unsafe {
             let texture = gl.create_texture()?;
+            gl.bind_texture(glow::TEXTURE_2D, Some(texture));
+            gl.bind_texture(glow::TEXTURE_2D, None);
             gl.texture_parameter_i32(texture, glow::TEXTURE_WRAP_S, glow::REPEAT as i32);
             gl.texture_parameter_i32(texture, glow::TEXTURE_WRAP_T, glow::REPEAT as i32);
 

@@ -1,7 +1,7 @@
 use glam::{Mat4, Vec3};
 
 pub struct Transform {
-    mat: Mat4,
+    pub mat: Mat4,
 }
 
 impl Transform {

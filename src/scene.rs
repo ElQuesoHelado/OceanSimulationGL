@@ -2,15 +2,15 @@ use crate::{material::Material, mesh::MeshId, mops::Transform};
 
 pub struct Instance {
     pub transform: Transform,
-    pub mesh: MeshId,
+    pub mesh_id: MeshId,
     pub material: Material,
 }
 
 impl Instance {
-    pub fn new(mesh: MeshId, material: Material) -> Self {
+    pub fn new(mesh_id: MeshId, material: Material) -> Self {
         Self {
             transform: Transform::new(),
-            mesh,
+            mesh_id,
             material,
         }
     }

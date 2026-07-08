@@ -5,15 +5,15 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 uniform sampler2D uTexture;
-uniform vec3 uColor;
+uniform vec4 uColor;
 
-uniform vec3 lightPos;
-uniform vec3 lightColor;
+uniform vec3 uLightPos;
+uniform vec3 uLightColor;
 
 // Brillos
-uniform vec3 viewPos;
+uniform vec3 uEye;
 
-uniform float shininess;
+uniform float uShininess;
 
 uniform bool uLightingEnabled;
 
@@ -22,35 +22,35 @@ out vec4 FragColor;
 void main()
 {
   vec4 texColor = texture(uTexture, TexCoord);
-  vec3 baseColor = mix(uColor, texColor.rgb, 0.7);
+  vec3 baseColor = mix(uColor.rgb, texColor.rgb, 0.7);
 
   vec3 result;
 
   if(uLightingEnabled){
     // Ambiental
     float ambientStrength = 0.4;
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 ambient = ambientStrength * uLightColor;
 
     // Difusa
     vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(lightPos - FragPos);
+    vec3 lightDir = normalize(uLightPos - FragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
     float diffuseStrength = 2;
-    vec3 diffuse = diffuseStrength * diff * lightColor;
+    vec3 diffuse = diffuseStrength * diff * uLightColor;
 
     // Especular (Blinn-Phong)
-    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 viewDir = normalize(uEye - FragPos);
 
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     float spec = pow(
         max(dot(norm, halfwayDir), 0.0),
-        shininess
+        uShininess
     );
 
     vec3 specular =
-        2 * spec * lightColor;
+        2 * spec * uLightColor;
 
     result =
         (ambient + diffuse) * baseColor +
@@ -60,5 +60,6 @@ void main()
   }
 
 
-  FragColor = vec4(result, texColor.a);
+  FragColor = vec4(result, texColor.a * uColor.a);
+  // FragColor = vec4(1,1,1,1);
 }

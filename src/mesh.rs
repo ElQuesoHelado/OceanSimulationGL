@@ -2,6 +2,7 @@ use glow::HasContext;
 
 use crate::figures;
 
+#[derive(Clone, Copy)]
 pub enum MeshId {
     Cube,
     Cone,
@@ -72,6 +73,15 @@ impl Mesh {
             let vbo_texcoords = gl.create_buffer().unwrap();
             let ebo = gl.create_buffer().unwrap();
 
+            gl.bind_vertex_array(Some(vao));
+            gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo_positions));
+            gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo_normals));
+            gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo_texcoords));
+            gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ebo));
+            gl.bind_vertex_array(None);
+            gl.bind_buffer(glow::ARRAY_BUFFER, None);
+            gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, None);
+
             gl.named_buffer_data_u8_slice(
                 vbo_positions,
                 bytemuck::cast_slice(&data.positions),
@@ -93,6 +103,8 @@ impl Mesh {
                 glow::STATIC_DRAW,
             );
 
+            // println!("{:?}\n\n", data.indices);
+
             // posiciones -> binding 0
             gl.vertex_array_vertex_buffer(vao, 0, Some(vbo_positions), 0, 3 * 4);
             gl.enable_vertex_array_attrib(vao, 0);
@@ -113,6 +125,15 @@ impl Mesh {
 
             gl.vertex_array_element_buffer(vao, Some(ebo));
 
+            // println!(
+            //     "positions: {}, normals: {}, texcoords: {}, indices: {}, max_index: {}",
+            //     data.positions.len(),
+            //     data.normals.len(),
+            //     data.texcoords.len(),
+            //     data.indices.len(),
+            //     data.indices.iter().copied().max().unwrap_or(0),
+            // );
+
             Self {
                 vao,
                 vbo_positions,
@@ -125,6 +146,7 @@ impl Mesh {
     }
 
     pub fn draw(&self, gl: &glow::Context) {
+        // println!("{}", self.index_count);
         unsafe {
             gl.bind_vertex_array(Some(self.vao));
             gl.draw_elements(glow::TRIANGLES, self.index_count, glow::UNSIGNED_INT, 0);

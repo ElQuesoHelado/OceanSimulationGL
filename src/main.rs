@@ -3,6 +3,7 @@ mod camera;
 mod ejemplo;
 mod figures;
 mod gizmo;
+mod input_state;
 mod light;
 mod material;
 mod mesh;

@@ -6,7 +6,7 @@ use glam::{Vec3, Vec4, vec3, vec4};
 use glow::HasContext;
 use raw_window_handle::HasWindowHandle;
 use winit::application::ApplicationHandler;
-use winit::event::{KeyEvent, WindowEvent};
+use winit::event::{KeyEvent, MouseButton, WindowEvent};
 use winit::event_loop::ActiveEventLoop;
 use winit::keyboard::{Key, NamedKey};
 use winit::window::{Window, WindowId};
@@ -20,6 +20,7 @@ use glutin_winit::{DisplayBuilder, GlWindow};
 
 use crate::camera::Camera;
 use crate::gizmo::Gizmo;
+use crate::input_state::InputState;
 use crate::light::Light;
 use crate::material::Material;
 use crate::mesh::{self, MeshId, MeshLibrary};
@@ -67,9 +68,30 @@ struct AppState {
     standard_renderer: StandardRenderer,
     ctx: GraphicsContext,
     scene: Scene,
+    input: InputState,
     camera: Camera,
     gizmo: Gizmo,
     light: Light,
+}
+
+impl AppState {
+    pub fn process_input(&mut self) {
+        let alt = self.input.key_pressed(Key::Named(NamedKey::Alt));
+        let shift = self.input.key_pressed(Key::Named(NamedKey::Shift));
+        let left_pressed = self.input.mouse_button_pressed(MouseButton::Left);
+
+        if alt && left_pressed {
+            self.camera.orbit(
+                self.input.mouse_dx as f32 * 0.1,
+                -self.input.mouse_dy as f32 * 0.1,
+            );
+            return;
+        } else if shift && left_pressed {
+            self.camera
+                .pan(self.input.mouse_dx as f32, self.input.mouse_dy as f32);
+            return;
+        }
+    }
 }
 
 struct App {
@@ -194,6 +216,7 @@ impl ApplicationHandler for App {
                 texture_library,
             },
             scene,
+            input: InputState::default(),
             camera,
             gizmo,
             light,
@@ -206,6 +229,32 @@ impl ApplicationHandler for App {
         };
 
         match event {
+            WindowEvent::CursorMoved { position, .. } => {
+                state.input.on_cursor_moved(position.x, position.y);
+            }
+            WindowEvent::MouseInput {
+                button,
+                state: btn_state,
+                ..
+            } => {
+                state.input.on_mouse_button(button, btn_state);
+            }
+            WindowEvent::KeyboardInput { event, .. } => {
+                if event.logical_key == Key::Named(NamedKey::Escape) {
+                    event_loop.exit();
+                } else {
+                    state
+                        .input
+                        .on_keyboard_input(event.logical_key, event.state);
+                }
+            }
+            WindowEvent::MouseWheel { delta, .. } => {
+                let scroll_amount = match delta {
+                    winit::event::MouseScrollDelta::LineDelta(_x, y) => y as f64,
+                    winit::event::MouseScrollDelta::PixelDelta(pos) => pos.y,
+                };
+                state.camera.zoom(scroll_amount as f32);
+            }
             WindowEvent::Resized(size) if size.width != 0 && size.height != 0 => {
                 state.gl_surface.resize(
                     &state.gl_context,
@@ -217,23 +266,18 @@ impl ApplicationHandler for App {
                     .camera
                     .set_aspect(size.width as f32, size.height as f32);
             }
-            WindowEvent::CloseRequested
-            | WindowEvent::KeyboardInput {
-                event:
-                    KeyEvent {
-                        logical_key: Key::Named(NamedKey::Escape),
-                        ..
-                    },
-                ..
-            } => event_loop.exit(),
+            WindowEvent::CloseRequested => event_loop.exit(),
             _ => {}
         }
     }
 
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
-        let Some(state) = self.state.as_ref() else {
+        let Some(state) = self.state.as_mut() else {
             return;
         };
+
+        state.process_input();
+        state.input.end_frame();
 
         state.ctx.clear();
         state.standard_renderer.draw(

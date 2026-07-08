@@ -28,8 +28,6 @@ impl InputState {
         self.mouse_dy = 0.0;
     }
 
-    // --- Alimentado desde window_event ---
-
     pub fn on_keyboard_input(&mut self, key: Key, state: ElementState) {
         match state {
             ElementState::Pressed => {

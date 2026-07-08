@@ -16,6 +16,18 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
+# --- NUEVO: Rutas y archivos fuente de ImGui ---
+set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+)
+# -----------------------------------------------
+
 add_executable(app
     main.cpp
     src/App/App.cpp
@@ -30,13 +42,17 @@ add_executable(app
     src/stb_image.cpp
     src/ocean/config.cpp
     src/ocean/draw.cpp
+    ${IMGUI_SOURCES}
 )
 
 target_include_directories(app PRIVATE
         glad/include
-        include)
+        include
+        ${IMGUI_DIR}           # <-- Para que encuentre <imgui.h>
+        ${IMGUI_DIR}/backends  # <-- Para que encuentre las integraciones (glfw/opengl)
+)
 
-target_link_libraries(app glfw OpenGL::GL glm::glm imgui)
+target_link_libraries(app glfw OpenGL::GL glm::glm)
 
 add_custom_command(
     TARGET app POST_BUILD

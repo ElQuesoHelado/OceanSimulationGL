@@ -82,8 +82,8 @@ void App::load_textures() {
     if (fs::exists(path) && fs::is_directory(path)) {
       for (const auto &entry : fs::directory_iterator(path)) {
         if (fs::is_regular_file(entry.path())) {
-          texture_manager[entry.path().stem()] = std::make_shared<Texture>(entry.path());
-          texture_names.push_back(entry.path().stem());
+          texture_manager[entry.path().stem().string()] = std::make_shared<Texture>(entry.path().string());
+          texture_names.push_back(entry.path().stem().string());
         }
       }
     }

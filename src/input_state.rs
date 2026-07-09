@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use winit::event::{ElementState, MouseButton};
-use winit::keyboard::{Key, NamedKey};
+use winit::keyboard::{Key, KeyCode, NamedKey};
 
 #[derive(Default)]
 pub struct InputState {
@@ -9,12 +9,12 @@ pub struct InputState {
     pub mouse_dx: f64,
     pub mouse_dy: f64,
 
-    keys_down: HashSet<Key>,
+    keys_down: HashSet<KeyCode>,
     mouse_buttons_down: HashSet<MouseButton>,
 }
 
 impl InputState {
-    pub fn key_pressed(&self, key: Key) -> bool {
+    pub fn key_pressed(&self, key: KeyCode) -> bool {
         self.keys_down.contains(&key)
     }
 
@@ -27,7 +27,7 @@ impl InputState {
         self.mouse_dy = 0.0;
     }
 
-    pub fn on_keyboard_input(&mut self, key: Key, state: ElementState) {
+    pub fn on_keyboard_input(&mut self, key: KeyCode, state: ElementState) {
         match state {
             ElementState::Pressed => {
                 self.keys_down.insert(key);

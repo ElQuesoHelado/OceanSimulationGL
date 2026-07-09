@@ -2,7 +2,11 @@ use glam::{Mat4, Vec3, camera};
 use glow::HasContext;
 
 use crate::{
-    app::GraphicsContext, camera::Camera, light::Light, mesh::MeshLibrary, scene::Instance,
+    app::GraphicsContext,
+    camera::Camera,
+    light::Light,
+    mesh::{MeshLibrary, SimpleMesh},
+    scene::Instance,
     shader::Shader,
 };
 
@@ -26,7 +30,7 @@ impl StandardRenderer {
         camera: &Camera,
         light: &Light,
     ) {
-        let gl = &ctx.gl;
+        let gl = ctx.gl();
 
         self.shader.activate(gl);
         self.shader.set_mat4(gl, "uView", &camera.view());
@@ -63,6 +67,8 @@ impl StandardRenderer {
 
 pub struct BillboardRenderer {
     shader: Shader,
+    floor_vertices: [Vec3; 6],
+    giz_pts: [Vec3; 6],
 }
 
 impl BillboardRenderer {
@@ -72,11 +78,29 @@ impl BillboardRenderer {
         shader.activate(gl);
         shader.set_int(gl, "uTexture", 0);
 
-        Ok(Self { shader })
+        Ok(Self {
+            shader,
+            floor_vertices: [
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 1000.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 1000.0),
+                Vec3::new(0.0, 0.0, 1000.0),
+            ],
+            giz_pts: [
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 1000.0, 0.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1000.0),
+            ],
+        })
     }
 
     pub fn draw(&self, ctx: &GraphicsContext, instances: &[Instance], camera: &Camera) {
-        let gl = &ctx.gl;
+        let gl = ctx.gl();
 
         self.shader.activate(gl);
 
@@ -115,7 +139,36 @@ impl BillboardRenderer {
         }
 
         unsafe {
-            // gl.disable(glow::BLEND);
+            gl.disable(glow::BLEND);
         }
+    }
+}
+
+pub struct SimpleColorRenderer {
+    shader: Shader,
+}
+
+impl SimpleColorRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        Ok(Self {
+            shader: Shader::new(gl, vertex_path, frag_path)?,
+        })
+    }
+
+    pub fn draw(
+        &self,
+        gl: &glow::Context,
+        mesh: &SimpleMesh,
+        model: &glam::Mat4,
+        view: &glam::Mat4,
+        proj: &glam::Mat4,
+        color: glam::Vec3,
+    ) {
+        self.shader.activate(gl);
+        self.shader.set_mat4(gl, "uModel", model);
+        self.shader.set_mat4(gl, "uView", view);
+        self.shader.set_mat4(gl, "uProjection", proj);
+        self.shader.set_vec3(gl, "uColor", &color);
+        mesh.draw(gl);
     }
 }

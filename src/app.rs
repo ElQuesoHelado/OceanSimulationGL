@@ -1,14 +1,16 @@
 use std::error::Error;
 use std::ffi::CString;
 use std::num::NonZeroU32;
+use std::rc::Rc;
 
+use dear_imgui_winit::HiDpiMode;
 use glam::{Vec3, Vec4, vec3, vec4};
 use glow::HasContext;
 use raw_window_handle::HasWindowHandle;
 use winit::application::ApplicationHandler;
 use winit::event::{KeyEvent, MouseButton, WindowEvent};
 use winit::event_loop::ActiveEventLoop;
-use winit::keyboard::{Key, NamedKey};
+use winit::keyboard::{Key, KeyCode, NamedKey, PhysicalKey};
 use winit::window::{Window, WindowId};
 
 use glutin::config::ConfigTemplateBuilder;
@@ -19,14 +21,14 @@ use glutin::surface::{Surface, SwapInterval, WindowSurface};
 use glutin_winit::{DisplayBuilder, GlWindow};
 
 use crate::camera::Camera;
-use crate::gizmo::Gizmo;
+use crate::gizmo::FloorGizmo;
 use crate::input_state::InputState;
 use crate::light::Light;
 use crate::material::Material;
 use crate::mesh::{self, MeshId, MeshLibrary};
 use crate::mops::Transform;
 use crate::rain::Rain;
-use crate::renderer::{BillboardRenderer, StandardRenderer};
+use crate::renderer::{BillboardRenderer, SimpleColorRenderer, StandardRenderer};
 use crate::scene::{Instance, Scene};
 use crate::texture::TextureLibrary;
 use crate::{figures, scene};
@@ -42,20 +44,29 @@ pub fn run() -> Result<(), Box<dyn Error>> {
 }
 
 pub struct GraphicsContext {
-    pub gl: glow::Context,
+    pub imgui_ctx: dear_imgui_rs::Context,
+    pub platform: dear_imgui_winit::WinitPlatform,
+    pub renderer: dear_imgui_glow::GlowRenderer,
     pub mesh_library: MeshLibrary,
     pub texture_library: TextureLibrary,
 }
 
 impl GraphicsContext {
+    pub fn gl(&self) -> &glow::Context {
+        self.renderer
+            .gl_context()
+            .map(|e| &*e)
+            .expect("Glow Context no existente")
+    }
+
     pub fn resize(&self, width: i32, height: i32) {
-        unsafe { self.gl.viewport(0, 0, width, height) };
+        unsafe { self.gl().viewport(0, 0, width, height) };
     }
 
     pub fn clear(&self) {
         unsafe {
-            self.gl.clear_color(0.2, 0.2, 0.2, 1.0);
-            self.gl
+            self.gl().clear_color(0.2, 0.2, 0.2, 1.0);
+            self.gl()
                 .clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
     }
@@ -68,20 +79,25 @@ struct AppState {
     gl_surface: Surface<WindowSurface>,
     standard_renderer: StandardRenderer,
     billboard_renderer: BillboardRenderer,
-    ctx: GraphicsContext,
+    floor_giz_renderer: SimpleColorRenderer,
+    graph_ctx: GraphicsContext,
     scene: Scene,
     input: InputState,
     camera: Camera,
-    gizmo: Gizmo,
+    floor_gizmo: FloorGizmo,
     light: Light,
     rain: Rain,
 }
 
 impl AppState {
     pub fn process_input(&mut self) {
-        let alt = self.input.key_pressed(Key::Named(NamedKey::Alt));
-        let shift = self.input.key_pressed(Key::Named(NamedKey::Shift));
+        let alt = self.input.key_pressed(KeyCode::AltLeft);
+        let shift = self.input.key_pressed(KeyCode::ShiftLeft);
         let left_pressed = self.input.mouse_button_pressed(MouseButton::Left);
+        let w = self.input.key_pressed(KeyCode::KeyW);
+        let s = self.input.key_pressed(KeyCode::KeyS);
+        let a = self.input.key_pressed(KeyCode::KeyA);
+        let d = self.input.key_pressed(KeyCode::KeyD);
 
         if alt && left_pressed {
             self.camera.orbit(
@@ -93,6 +109,13 @@ impl AppState {
             self.camera
                 .pan(self.input.mouse_dx as f32, self.input.mouse_dy as f32);
             return;
+        }
+        //TODO:
+        if d {
+            self.camera.target.x += 0.1;
+        }
+        if a {
+            self.camera.target.x -= 0.1;
         }
     }
 }
@@ -194,7 +217,14 @@ impl ApplicationHandler for App {
         )
         .expect("Creacion de Renderer Billboard fallida");
 
-        let gizmo = Gizmo::new(&gl);
+        let floor_giz_renderer = SimpleColorRenderer::new(
+            &gl,
+            "assets/shaders/floor_giz.vert",
+            "assets/shaders/floor_giz.frag",
+        )
+        .expect("Creacion de Renderer Piso Gizmo fallida");
+
+        let floor_gizmo = FloorGizmo::new(&gl);
 
         let mesh_library = MeshLibrary::new(&gl);
         let texture_library = TextureLibrary::new(&gl, "assets/textures");
@@ -215,7 +245,14 @@ impl ApplicationHandler for App {
             color: vec3(1f32, 1f32, 1f32),
         };
 
-        let rain = Rain::new(&mut scene, &texture_library, 200);
+        let rain = Rain::new(&mut scene, &texture_library, 2000);
+
+        let mut imgui_ctx = dear_imgui_rs::Context::create();
+        let mut platform = dear_imgui_winit::WinitPlatform::new(&mut imgui_ctx);
+        platform.attach_window(&window, HiDpiMode::Default, &mut imgui_ctx);
+
+        let mut renderer = dear_imgui_glow::GlowRenderer::new(gl, &mut imgui_ctx)
+            .expect("Creacion de renderer Imgui fallida");
 
         self.state = Some(AppState {
             window,
@@ -223,15 +260,18 @@ impl ApplicationHandler for App {
             gl_surface,
             standard_renderer,
             billboard_renderer,
-            ctx: GraphicsContext {
-                gl,
+            floor_giz_renderer,
+            graph_ctx: GraphicsContext {
+                imgui_ctx,
+                platform,
+                renderer,
                 mesh_library,
                 texture_library,
             },
             scene,
             input: InputState::default(),
             camera,
-            gizmo,
+            floor_gizmo,
             light,
             rain,
         });
@@ -254,12 +294,14 @@ impl ApplicationHandler for App {
                 state.input.on_mouse_button(button, btn_state);
             }
             WindowEvent::KeyboardInput { event, .. } => {
-                if event.logical_key == Key::Named(NamedKey::Escape) {
-                    event_loop.exit();
-                } else {
-                    state
-                        .input
-                        .on_keyboard_input(event.logical_key, event.state);
+                use winit::keyboard::{KeyCode, PhysicalKey};
+
+                if let PhysicalKey::Code(code) = event.physical_key {
+                    if code == KeyCode::Escape {
+                        event_loop.exit();
+                    }
+
+                    state.input.on_keyboard_input(code, event.state);
                 }
             }
             WindowEvent::MouseWheel { delta, .. } => {
@@ -275,7 +317,9 @@ impl ApplicationHandler for App {
                     NonZeroU32::new(size.width).unwrap(),
                     NonZeroU32::new(size.height).unwrap(),
                 );
-                state.ctx.resize(size.width as i32, size.height as i32);
+                state
+                    .graph_ctx
+                    .resize(size.width as i32, size.height as i32);
                 state
                     .camera
                     .set_aspect(size.width as f32, size.height as f32);
@@ -295,9 +339,9 @@ impl ApplicationHandler for App {
         state.process_input();
         state.input.end_frame();
 
-        state.ctx.clear();
+        state.graph_ctx.clear();
         state.standard_renderer.draw(
-            &state.ctx,
+            &state.graph_ctx,
             &state.scene.prim_instances,
             &state.camera,
             &state.light,
@@ -305,7 +349,25 @@ impl ApplicationHandler for App {
 
         state
             .billboard_renderer
-            .draw(&state.ctx, &state.scene.bill_instances, &state.camera);
+            .draw(&state.graph_ctx, &state.scene.bill_instances, &state.camera);
+
+        let identity = glam::Mat4::IDENTITY;
+        state.floor_giz_renderer.draw(
+            &state.graph_ctx.gl(),
+            &state.floor_gizmo.floor,
+            &identity,
+            &state.camera.view(),
+            &state.camera.projection(),
+            state.floor_gizmo.floor_color,
+        );
+        state.floor_giz_renderer.draw(
+            &state.graph_ctx.gl(),
+            &state.floor_gizmo.gizmo,
+            &identity,
+            &state.camera.view(),
+            &state.camera.projection(),
+            state.floor_gizmo.gizmo_color,
+        );
 
         // if let Some(idx) = state.scene.selected {
         //     let world_pos = state.scene.instances[idx].transform.w_axis.truncate();

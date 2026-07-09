@@ -5,7 +5,9 @@ edition = "2024"
 
 [dependencies]
 bytemuck = "1.25.0"
+dear-imgui-glow = "0.15.1"
 dear-imgui-rs = "0.15.1"
+dear-imgui-winit = "0.15.1"
 glam = "0.33.2"
 glow = "0.17.0"
 glutin = "0.32.3"

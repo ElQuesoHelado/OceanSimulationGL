@@ -155,3 +155,53 @@ impl Mesh {
         }
     }
 }
+
+pub struct SimpleMesh {
+    vao: glow::VertexArray,
+    vbo: glow::Buffer,
+    vertex_count: i32,
+    draw_mode: u32,
+}
+
+impl SimpleMesh {
+    pub fn upload(gl: &glow::Context, positions: &[[f32; 3]], draw_mode: u32) -> Self {
+        unsafe {
+            let vao = gl.create_vertex_array().unwrap();
+            let vbo = gl.create_buffer().unwrap();
+
+            // Materializa los objetos (glow usa Gen* por debajo, no Create*)
+            gl.bind_vertex_array(Some(vao));
+            gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
+            gl.bind_vertex_array(None);
+            gl.bind_buffer(glow::ARRAY_BUFFER, None);
+
+            gl.named_buffer_data_u8_slice(vbo, bytemuck::cast_slice(positions), glow::STATIC_DRAW);
+
+            gl.vertex_array_vertex_buffer(vao, 0, Some(vbo), 0, 3 * 4);
+            gl.enable_vertex_array_attrib(vao, 0);
+            gl.vertex_array_attrib_format_f32(vao, 0, 3, glow::FLOAT, false, 0);
+            gl.vertex_array_attrib_binding_f32(vao, 0, 0);
+
+            Self {
+                vao,
+                vbo,
+                vertex_count: positions.len() as i32,
+                draw_mode,
+            }
+        }
+    }
+
+    pub fn draw(&self, gl: &glow::Context) {
+        unsafe {
+            gl.bind_vertex_array(Some(self.vao));
+            gl.draw_arrays(self.draw_mode, 0, self.vertex_count);
+        }
+    }
+
+    pub fn destroy(&self, gl: &glow::Context) {
+        unsafe {
+            gl.delete_vertex_array(self.vao);
+            gl.delete_buffer(self.vbo);
+        }
+    }
+}

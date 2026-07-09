@@ -199,7 +199,9 @@ name = "base3DR"
 version = "0.1.0"
 dependencies = [
  "bytemuck",
+ "dear-imgui-glow",
  "dear-imgui-rs",
+ "dear-imgui-winit",
  "glam",
  "glow",
  "glutin",
@@ -473,6 +475,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da45ea4739530b7ff801e45f9b82adfefd0a2c0e5f22dcefaac6e1d3439d251e"
 
 [[package]]
+name = "dear-imgui-glow"
+version = "0.15.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51d590397ba11f04c3e85d715b4afb939966f688a34870878ec5f5764cd3b46f"
+dependencies = [
+ "dear-imgui-rs",
+ "glow",
+ "memoffset",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "dear-imgui-rs"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -498,6 +512,18 @@ dependencies = [
  "cfg-if",
  "dear-imgui-build-support",
  "mint",
+]
+
+[[package]]
+name = "dear-imgui-winit"
+version = "0.15.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e21199655fe11709196e0d7dd3c0837f5c4e330703b6c1e92d5254cded26bf4"
+dependencies = [
+ "dear-imgui-rs",
+ "web-sys",
+ "web-time",
+ "winit",
 ]
 
 [[package]]
@@ -1111,6 +1137,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d1219ed1b7f229ee7104d281dd01d6802fe28bb6e95d292942c4daacdeb798c0"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "memoffset"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
+dependencies = [
+ "autocfg",
 ]
 
 [[package]]

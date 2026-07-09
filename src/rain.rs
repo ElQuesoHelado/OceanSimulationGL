@@ -29,9 +29,9 @@ impl Rain {
 
             transform
                 .trans(vec3(
-                    rng.random_range(-20.0..20.0),
+                    rng.random_range(-50.0..50.0),
                     rng.random_range(2.0..30.0),
-                    rng.random_range(-20.0..20.0),
+                    rng.random_range(-50.0..50.0),
                 ))
                 .scale(vec3(0.1, 0.8, 1.0));
 
@@ -58,9 +58,9 @@ impl Rain {
 
             if instance.transform.position().y <= 0.0 {
                 instance.transform.set_position(vec3(
-                    rng.random_range(-20.0..20.0),
+                    rng.random_range(-50.0..50.0),
                     rng.random_range(2.0..30.0),
-                    rng.random_range(-20.0..20.0),
+                    rng.random_range(-50.0..50.0),
                 ));
             }
         }

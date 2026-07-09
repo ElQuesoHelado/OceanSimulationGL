@@ -12,10 +12,10 @@ out vec2 TexCoord;
 
 void main()
 {
-    // Extraer únicamente la traslación del modelo
+    // Extraer unicamente la traslacion del modelo
     vec3 center = vec3(uModel[3]);
 
-    // Obtener los ejes de la cámara
+    // Obtener los ejes de la camara
     vec3 right = vec3(
         uView[0][0],
         uView[1][0],

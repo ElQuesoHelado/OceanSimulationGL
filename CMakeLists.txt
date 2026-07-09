@@ -1,8 +1,18 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14) # Aumentado a 3.14 para compatibilidad con FetchContent
 
 project(paint)
 
 set(CMAKE_CXX_STANDARD 23)
+
+# --- Descarga automática de ImGui ---
+include(FetchContent)
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG        v1.90.8
+)
+FetchContent_MakeAvailable(imgui)
+# ------------------------------------
 
 find_package(glfw3 CONFIG QUIET)
 if(NOT glfw3_FOUND)
@@ -15,18 +25,6 @@ if(NOT glm_FOUND)
 endif()
 
 find_package(OpenGL REQUIRED)
-
-# --- NUEVO: Rutas y archivos fuente de ImGui ---
-set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
-set(IMGUI_SOURCES
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
-)
-# -----------------------------------------------
 
 add_executable(app
     main.cpp
@@ -42,14 +40,20 @@ add_executable(app
     src/stb_image.cpp
     src/ocean/config.cpp
     src/ocean/draw.cpp
-    ${IMGUI_SOURCES}
+    # Archivos fuente de ImGui descargados automáticamente
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
 target_include_directories(app PRIVATE
         glad/include
         include
-        ${IMGUI_DIR}           # <-- Para que encuentre <imgui.h>
-        ${IMGUI_DIR}/backends  # <-- Para que encuentre las integraciones (glfw/opengl)
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
 )
 
 target_link_libraries(app glfw OpenGL::GL glm::glm)

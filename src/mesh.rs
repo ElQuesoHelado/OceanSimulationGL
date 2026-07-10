@@ -2,7 +2,7 @@ use glow::HasContext;
 
 use crate::figures;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum MeshId {
     Cube,
     Cone,

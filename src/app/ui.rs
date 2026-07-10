@@ -1,0 +1,176 @@
+use super::*;
+
+use dear_imgui_rs::{Condition, Ui, WindowFlags};
+
+const MESH_OPTIONS: &[(&str, MeshId)] = &[
+    ("Cubo", MeshId::Cube),
+    ("Esfera", MeshId::Sphere),
+    ("Toro", MeshId::Torus),
+    ("Botella", MeshId::Klein),
+    ("Roca", MeshId::Rock),
+    ("Pen", MeshId::Pen),
+    ("Cilindro", MeshId::Cylinder),
+    ("Tetraedro", MeshId::Tetrahedron),
+    ("Cono", MeshId::Cone),
+];
+
+impl App {
+    pub fn build_ui(&mut self, ui: &Ui, scene: &mut Scene, width: f32, height: f32) {
+        let ui_state = match &mut self.state {
+            Some(state) => state.ui_state,
+            None => return,
+        };
+
+        let toolbar_width = 100.0;
+
+        ui.window("Editor3D")
+            .position([0.0, 0.0], Condition::Always)
+            .size([toolbar_width, height as f32], Condition::Always)
+            .flags(WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE | WindowFlags::NO_COLLAPSE)
+            .build(|| {
+                ui.text("Figuras");
+                ui.separator();
+
+                for (label, mesh_id) in MESH_OPTIONS {
+                    let is_selected = ui_state.mesh_to_draw == *mesh_id;
+                    if ui.selectable_config(label).selected(is_selected).build() {
+                        ui_state.mesh_to_draw = *mesh_id;
+                    }
+                }
+
+                ui.separator();
+
+                let mut color = ui_state.selected_color.to_array();
+                if ui.color_edit4("Col", &mut color) {
+                    ui_state.selected_color = Vec4::from_array(color);
+                }
+
+                if ui.button("Paint") {
+                    if let Some(idx) = ui_state.selected_mesh {
+                        std::mem::swap(
+                            &mut scene.normal_instances[idx].material.color,
+                            &mut ui_state.buffered_color,
+                        );
+                        scene.normal_instances[idx].material.color = ui_state.selected_color;
+                        ui_state.selected_mesh = None;
+                    }
+                }
+
+                ui.separator();
+                ui.text("Operaciones");
+
+                // --- Escala ---
+                match stepper(ui, "SCL", "l1") {
+                    Step::Plus => self.with_selected(|p| p.scale([1.1, 1.1, 1.1])),
+                    Step::Minus => self.with_selected(|p| p.scale([0.9, 0.9, 0.9])),
+                    Step::None => {}
+                }
+
+                // --- Rotaciones ---
+                match stepper(ui, "ROTX", "l2") {
+                    Step::Plus => self.with_selected(|p| p.rotate(0.3, [1.0, 0.0, 0.0])),
+                    Step::Minus => self.with_selected(|p| p.rotate(-0.3, [1.0, 0.0, 0.0])),
+                    Step::None => {}
+                }
+                match stepper(ui, "ROTY", "l3") {
+                    Step::Plus => self.with_selected(|p| p.rotate(0.3, [0.0, 1.0, 0.0])),
+                    Step::Minus => self.with_selected(|p| p.rotate(-0.3, [0.0, 1.0, 0.0])),
+                    Step::None => {}
+                }
+                match stepper(ui, "ROTZ", "l4") {
+                    Step::Plus => self.with_selected(|p| p.rotate(0.3, [0.0, 0.0, 1.0])),
+                    Step::Minus => self.with_selected(|p| p.rotate(-0.3, [0.0, 0.0, 1.0])),
+                    Step::None => {}
+                }
+
+                // --- Traslaciones ---
+                match stepper(ui, "TRANSX", "l5") {
+                    Step::Plus => self.with_selected(|p| p.translate([1.0, 0.0, 0.0])),
+                    Step::Minus => self.with_selected(|p| p.translate([-1.0, 0.0, 0.0])),
+                    Step::None => {}
+                }
+                match stepper(ui, "TRANSY", "l6") {
+                    Step::Plus => self.with_selected(|p| p.translate([0.0, 1.0, 0.0])),
+                    Step::Minus => self.with_selected(|p| p.translate([0.0, -1.0, 0.0])),
+                    Step::None => {}
+                }
+                match stepper(ui, "TRANSZ", "l7") {
+                    Step::Plus => self.with_selected(|p| p.translate([0.0, 0.0, 1.0])),
+                    Step::Minus => self.with_selected(|p| p.translate([0.0, 0.0, -1.0])),
+                    Step::None => {}
+                }
+
+                // --- Miscs ---
+                ui.separator();
+                ui.text("MISCS");
+
+                if ui.checkbox("Wireframe", &mut self.wireframe) {
+                    self.apply_wireframe_mode(); // hace el glPolygonMode acá
+                }
+                ui.checkbox("Lighting", &mut self.enable_lighting);
+
+                if ui.button("DUPE") {
+                    if let Some(idx) = self.selected {
+                        std::mem::swap(&mut self.primitives[idx].color, &mut self.buffered_color);
+                        let dup = self.primitives[idx].clone();
+                        self.primitives.push(dup);
+                        self.selected = None;
+                    }
+                }
+                if ui.button("DEL") {
+                    if let Some(idx) = self.selected {
+                        std::mem::swap(&mut self.primitives[idx].color, &mut self.buffered_color);
+                        self.primitives.remove(idx);
+                        self.selected = None;
+                    }
+                }
+
+                ui.separator();
+                ui.text("Textures");
+
+                let list_height = 8.0 * ui.text_line_height_with_spacing();
+                if let Some(_token) = ui
+                    .list_box_config("##Textures")
+                    .size([-f32::MIN_POSITIVE, list_height])
+                    .begin(ui)
+                {
+                    for texture_name in &self.texture_names {
+                        if ui.selectable(texture_name) {
+                            if let Some(idx) = self.selected {
+                                self.primitives[idx].texture = self.texture_manager[texture_name];
+                            }
+                        }
+                    }
+                }
+            });
+    }
+
+    fn with_selected(&mut self, f: impl FnOnce(&mut Primitive)) {
+        if let Some(idx) = self.selected {
+            f(&mut self.primitives[idx]);
+        }
+    }
+}
+
+enum Step {
+    Plus,
+    Minus,
+    None,
+}
+
+fn stepper(ui: &Ui, label: &str, id: &str) -> Step {
+    ui.text(label);
+    ui.same_line();
+
+    let mut result = Step::None;
+
+    if ui.button(&format!("+##{id}_plus")) {
+        result = Step::Plus;
+    }
+    ui.same_line();
+    if ui.button(&format!("-##{id}_minus")) {
+        result = Step::Minus;
+    }
+
+    result
+}

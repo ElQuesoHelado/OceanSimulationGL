@@ -1,5 +1,6 @@
 use glam::{Mat4, Vec3};
 
+#[derive(Clone, Copy, PartialEq)]
 pub struct Transform {
     pub mat: Mat4,
 }

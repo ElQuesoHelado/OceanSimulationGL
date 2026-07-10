@@ -1,10 +1,12 @@
 // TODO: cambio a "particulas" genericas, en base a fuerza
 // - Check con delets de figuras
 
-use glam::vec3;
+use glam::{vec3, vec4};
 use rand::RngExt;
 
 use crate::{
+    material::Material,
+    mesh::MeshId,
     mops::Transform,
     scene::{Instance, Scene},
     texture::TextureLibrary,
@@ -24,10 +26,11 @@ impl Rain {
         let mut rng = rand::rng();
         let mut drops = Vec::with_capacity(n_drops);
 
-        for _ in 0..n_drops {
-            let mut transform = Transform::new();
+        let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 32., "blank")
+            .expect("Textura no encontrada");
 
-            transform
+        for _ in 0..n_drops {
+            let transform = *Transform::new()
                 .trans(vec3(
                     rng.random_range(-50.0..50.0),
                     rng.random_range(2.0..30.0),
@@ -35,9 +38,11 @@ impl Rain {
                 ))
                 .scale(vec3(0.1, 0.8, 1.0));
 
-            //transform.trans(vec3(0.0, 0.0, 0.0));
-
-            let id = scene.add_bill_instance_trans(transform, texture_library);
+            let id = scene.add_billboard_instance(Instance {
+                transform,
+                mesh_id: MeshId::Billboard,
+                material: material.clone(),
+            });
 
             drops.push(RainDrop {
                 instance_id: id,
@@ -52,7 +57,12 @@ impl Rain {
         let mut rng = rand::rng();
 
         for drop in &mut self.drops {
-            let instance = scene.bill_instance_mut(drop.instance_id);
+            let instance = match scene.get_instance_mut(drop.instance_id) {
+                Some(instance) => instance,
+                None => {
+                    continue;
+                }
+            };
 
             instance.transform.trans(vec3(0.0, -drop.speed * dt, 0.0));
 

@@ -1,5 +1,6 @@
 use crate::texture::TextureLibrary;
 
+#[derive(Clone, Copy, PartialEq)]
 pub struct Material {
     pub color: glam::Vec4,
     pub shininess: f32,

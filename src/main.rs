@@ -1,6 +1,5 @@
 mod app;
 mod camera;
-mod ejemplo;
 mod figures;
 mod gizmo;
 mod input_state;
@@ -13,6 +12,8 @@ mod renderer;
 mod scene;
 mod shader;
 mod texture;
+
+// use crate::app;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     app::run()

@@ -15,17 +15,25 @@ const MESH_OPTIONS: &[(&str, MeshId)] = &[
 ];
 
 impl App {
-    pub fn build_ui(&mut self, ui: &Ui, scene: &mut Scene, width: f32, height: f32) {
-        let ui_state = match &mut self.state {
-            Some(state) => state.ui_state,
-            None => return,
+    pub fn build_ui(
+        &mut self,
+        gl: &glow::Context,
+        ui: &Ui,
+        scene: &mut Scene,
+        width: f32,
+        height: f32,
+    ) {
+        let Some(app_state) = self.state.as_mut() else {
+            return;
         };
+
+        let ui_state = &mut app_state.ui_state;
 
         let toolbar_width = 100.0;
 
         ui.window("Editor3D")
             .position([0.0, 0.0], Condition::Always)
-            .size([toolbar_width, height as f32], Condition::Always)
+            .size([toolbar_width, height], Condition::Always)
             .flags(WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE | WindowFlags::NO_COLLAPSE)
             .build(|| {
                 ui.text("Figuras");
@@ -45,15 +53,15 @@ impl App {
                     ui_state.selected_color = Vec4::from_array(color);
                 }
 
-                if ui.button("Paint") {
-                    if let Some(idx) = ui_state.selected_mesh {
-                        std::mem::swap(
-                            &mut scene.normal_instances[idx].material.color,
-                            &mut ui_state.buffered_color,
-                        );
-                        scene.normal_instances[idx].material.color = ui_state.selected_color;
-                        ui_state.selected_mesh = None;
-                    }
+                if ui.button("Paint")
+                    && let Some(idx) = ui_state.selected_mesh
+                {
+                    std::mem::swap(
+                        &mut scene.normal_instances[idx].material.color,
+                        &mut ui_state.buffered_color,
+                    );
+                    scene.normal_instances[idx].material.color = ui_state.selected_color;
+                    ui_state.selected_mesh = None;
                 }
 
                 ui.separator();
@@ -61,42 +69,74 @@ impl App {
 
                 // --- Escala ---
                 match stepper(ui, "SCL", "l1") {
-                    Step::Plus => self.with_selected(|p| p.scale([1.1, 1.1, 1.1])),
-                    Step::Minus => self.with_selected(|p| p.scale([0.9, 0.9, 0.9])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.scale(vec3(1.1, 1.1, 1.1));
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.scale(vec3(0.9, 0.9, 0.9));
+                    }),
                     Step::None => {}
                 }
 
                 // --- Rotaciones ---
                 match stepper(ui, "ROTX", "l2") {
-                    Step::Plus => self.with_selected(|p| p.rotate(0.3, [1.0, 0.0, 0.0])),
-                    Step::Minus => self.with_selected(|p| p.rotate(-0.3, [1.0, 0.0, 0.0])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.rotate_x(0.3);
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.rotate_x(-0.3);
+                    }),
                     Step::None => {}
                 }
+
                 match stepper(ui, "ROTY", "l3") {
-                    Step::Plus => self.with_selected(|p| p.rotate(0.3, [0.0, 1.0, 0.0])),
-                    Step::Minus => self.with_selected(|p| p.rotate(-0.3, [0.0, 1.0, 0.0])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.rotate_y(0.3);
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.rotate_y(-0.3);
+                    }),
                     Step::None => {}
                 }
+
                 match stepper(ui, "ROTZ", "l4") {
-                    Step::Plus => self.with_selected(|p| p.rotate(0.3, [0.0, 0.0, 1.0])),
-                    Step::Minus => self.with_selected(|p| p.rotate(-0.3, [0.0, 0.0, 1.0])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.rotate_z(0.3);
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.rotate_z(-0.3);
+                    }),
                     Step::None => {}
                 }
 
                 // --- Traslaciones ---
                 match stepper(ui, "TRANSX", "l5") {
-                    Step::Plus => self.with_selected(|p| p.translate([1.0, 0.0, 0.0])),
-                    Step::Minus => self.with_selected(|p| p.translate([-1.0, 0.0, 0.0])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.translate(vec3(1.0, 0.0, 0.0));
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.translate(vec3(-1.0, 0.0, 0.0));
+                    }),
                     Step::None => {}
                 }
+
                 match stepper(ui, "TRANSY", "l6") {
-                    Step::Plus => self.with_selected(|p| p.translate([0.0, 1.0, 0.0])),
-                    Step::Minus => self.with_selected(|p| p.translate([0.0, -1.0, 0.0])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.translate(vec3(0.0, 1.0, 0.0));
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.translate(vec3(0.0, -1.0, 0.0));
+                    }),
                     Step::None => {}
                 }
+
                 match stepper(ui, "TRANSZ", "l7") {
-                    Step::Plus => self.with_selected(|p| p.translate([0.0, 0.0, 1.0])),
-                    Step::Minus => self.with_selected(|p| p.translate([0.0, 0.0, -1.0])),
+                    Step::Plus => with_selected(ui_state, scene, |p| {
+                        p.transform.translate(vec3(0.0, 0.0, 1.0));
+                    }),
+                    Step::Minus => with_selected(ui_state, scene, |p| {
+                        p.transform.translate(vec3(0.0, 0.0, -1.0));
+                    }),
                     Step::None => {}
                 }
 
@@ -104,25 +144,40 @@ impl App {
                 ui.separator();
                 ui.text("MISCS");
 
-                if ui.checkbox("Wireframe", &mut self.wireframe) {
-                    self.apply_wireframe_mode(); // hace el glPolygonMode acá
+                if ui.checkbox("Wireframe", &mut ui_state.wireframe_enabled) {
+                    unsafe {
+                        gl.polygon_mode(
+                            glow::FRONT_AND_BACK,
+                            if ui_state.wireframe_enabled {
+                                glow::LINE
+                            } else {
+                                glow::FILL
+                            },
+                        );
+                    }
                 }
-                ui.checkbox("Lighting", &mut self.enable_lighting);
+                ui.checkbox("Lighting", &mut ui_state.lighting_enabled);
 
-                if ui.button("DUPE") {
-                    if let Some(idx) = self.selected {
-                        std::mem::swap(&mut self.primitives[idx].color, &mut self.buffered_color);
-                        let dup = self.primitives[idx].clone();
-                        self.primitives.push(dup);
-                        self.selected = None;
-                    }
+                if ui.button("DUPE")
+                    && let Some(idx) = ui_state.selected_mesh
+                {
+                    std::mem::swap(
+                        &mut scene.normal_instances[idx].material.color,
+                        &mut ui_state.buffered_color,
+                    );
+                    let dup = scene.normal_instances[idx].clone();
+                    scene.normal_instances.push(dup);
+                    ui_state.selected_mesh = None;
                 }
-                if ui.button("DEL") {
-                    if let Some(idx) = self.selected {
-                        std::mem::swap(&mut self.primitives[idx].color, &mut self.buffered_color);
-                        self.primitives.remove(idx);
-                        self.selected = None;
-                    }
+                if ui.button("DEL")
+                    && let Some(idx) = ui_state.selected_mesh
+                {
+                    std::mem::swap(
+                        &mut scene.normal_instances[idx].material.color,
+                        &mut ui_state.buffered_color,
+                    );
+                    scene.normal_instances.remove(idx);
+                    ui_state.selected_mesh = None;
                 }
 
                 ui.separator();
@@ -134,21 +189,23 @@ impl App {
                     .size([-f32::MIN_POSITIVE, list_height])
                     .begin(ui)
                 {
-                    for texture_name in &self.texture_names {
-                        if ui.selectable(texture_name) {
-                            if let Some(idx) = self.selected {
-                                self.primitives[idx].texture = self.texture_manager[texture_name];
-                            }
+                    let texture_library = &app_state.graph_ctx.texture_library;
+                    for texture_name in texture_library.names.keys() {
+                        if ui.selectable(texture_name)
+                            && let Some(idx) = ui_state.selected_mesh
+                            && let Some(tex_id) = texture_library.get_id_from_name(texture_name)
+                        {
+                            scene.normal_instances[idx].material.texture_id = tex_id;
                         }
                     }
                 }
             });
     }
+}
 
-    fn with_selected(&mut self, f: impl FnOnce(&mut Primitive)) {
-        if let Some(idx) = self.selected {
-            f(&mut self.primitives[idx]);
-        }
+fn with_selected(ui_state: &UiState, scene: &mut Scene, f: impl FnOnce(&mut Instance)) {
+    if let Some(idx) = ui_state.selected_mesh {
+        f(&mut scene.normal_instances[idx]);
     }
 }
 

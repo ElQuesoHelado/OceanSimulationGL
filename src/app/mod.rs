@@ -79,6 +79,8 @@ struct UiState {
     selected_mesh: Option<usize>,
     selected_color: glam::Vec4,
     buffered_color: glam::Vec4,
+    wireframe_enabled: bool,
+    lighting_enabled: bool,
 }
 
 impl UiState {
@@ -88,6 +90,8 @@ impl UiState {
             selected_mesh: None,
             selected_color: vec4(1f32, 1f32, 1f32, 1f32),
             buffered_color: vec4(1f32, 1f32, 1f32, 1f32),
+            wireframe_enabled: false,
+            lighting_enabled: false,
         }
     }
 }

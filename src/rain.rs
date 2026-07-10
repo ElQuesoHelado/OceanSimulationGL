@@ -31,7 +31,7 @@ impl Rain {
 
         for _ in 0..n_drops {
             let transform = *Transform::new()
-                .trans(vec3(
+                .translate(vec3(
                     rng.random_range(-50.0..50.0),
                     rng.random_range(2.0..30.0),
                     rng.random_range(-50.0..50.0),
@@ -64,7 +64,9 @@ impl Rain {
                 }
             };
 
-            instance.transform.trans(vec3(0.0, -drop.speed * dt, 0.0));
+            instance
+                .transform
+                .translate(vec3(0.0, -drop.speed * dt, 0.0));
 
             if instance.transform.position().y <= 0.0 {
                 instance.transform.set_position(vec3(

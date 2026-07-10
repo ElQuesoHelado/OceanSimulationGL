@@ -12,7 +12,7 @@ impl Transform {
         }
     }
 
-    pub fn trans(&mut self, t: Vec3) -> &mut Self {
+    pub fn translate(&mut self, t: Vec3) -> &mut Self {
         self.mat *= Mat4::from_translation(t);
         self
     }

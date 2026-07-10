@@ -2,6 +2,7 @@ use glam::vec4;
 
 use crate::{material::Material, mesh::MeshId, mops::Transform, texture::TextureLibrary};
 
+#[derive(Clone)]
 pub struct Instance {
     pub transform: Transform,
     pub mesh_id: MeshId,

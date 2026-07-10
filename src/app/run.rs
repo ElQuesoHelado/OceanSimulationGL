@@ -50,6 +50,25 @@ impl App {
         //         .draw(&state.renderer.gl, &state.camera, world_pos);
         // }
 
+        state
+            .graph_ctx
+            .platform
+            .prepare_frame(&state.window, &mut state.graph_ctx.imgui_ctx);
+        let ui = state.graph_ctx.imgui_ctx.frame();
+        self.build_ui(
+            state.graph_ctx.gl(),
+            ui,
+            &mut state.scene,
+            state.window.inner_size().width as f32,
+            state.window.inner_size().height as f32,
+        );
+        state
+            .graph_ctx
+            .platform
+            .prepare_render(&mut state.graph_ctx.imgui_ctx, &state.window);
+        let draw_data = state.graph_ctx.imgui_ctx.render();
+        state.graph_ctx.renderer.render(draw_data);
+
         state.window.request_redraw();
         state.gl_surface.swap_buffers(&state.gl_context).unwrap();
     }

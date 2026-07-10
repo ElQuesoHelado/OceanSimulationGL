@@ -1,6 +1,15 @@
 use super::*;
 
 impl App {
+    pub fn get_gl_context(&self) -> Option<&glow::Context> {
+        self.state
+            .as_ref()?
+            .graph_ctx
+            .renderer
+            .gl_context()
+            .map(|rc| rc.as_ref())
+    }
+
     pub fn resumed_impl(&mut self, event_loop: &ActiveEventLoop) {
         if self.state.is_some() {
             return;

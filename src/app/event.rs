@@ -1,15 +1,26 @@
+use winit::event::Event;
+
 use super::*;
 
 impl App {
     pub fn window_event_impl(
         &mut self,
         event_loop: &ActiveEventLoop,
-        _id: WindowId,
+        id: WindowId,
         event: WindowEvent,
     ) {
         let Some(state) = self.state.as_mut() else {
             return;
         };
+
+        state.graph_ctx.platform.handle_event(
+            &mut state.graph_ctx.imgui_ctx,
+            &state.window,
+            &Event::<()>::WindowEvent {
+                window_id: id,
+                event: event.clone(),
+            },
+        );
 
         match event {
             WindowEvent::CursorMoved { position, .. } => {

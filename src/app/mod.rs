@@ -46,7 +46,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
 }
 
 pub struct GraphicsContext {
-    pub imgui_ctx: dear_imgui_rs::Context,
     pub platform: dear_imgui_winit::WinitPlatform,
     pub renderer: dear_imgui_glow::GlowRenderer,
     pub mesh_library: MeshLibrary,
@@ -72,6 +71,10 @@ impl GraphicsContext {
                 .clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
         }
     }
+}
+
+pub struct UiContext {
+    pub imgui_ctx: dear_imgui_rs::Context,
 }
 
 struct UiState {
@@ -111,6 +114,7 @@ struct AppState {
     floor_gizmo: FloorGizmo,
     light: Light,
     rain: Rain,
+    ui_ctx: UiContext,
     ui_state: UiState,
 }
 

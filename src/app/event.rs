@@ -14,7 +14,7 @@ impl App {
         };
 
         state.graph_ctx.platform.handle_event(
-            &mut state.graph_ctx.imgui_ctx,
+            &mut state.ui_ctx.imgui_ctx,
             &state.window,
             &Event::<()>::WindowEvent {
                 window_id: id,

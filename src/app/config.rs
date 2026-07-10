@@ -131,14 +131,13 @@ impl App {
 
         let rain = Rain::new(&mut scene, &texture_library, 2000);
 
+        // Init Imgui
         let mut imgui_ctx = dear_imgui_rs::Context::create();
         let mut platform = dear_imgui_winit::WinitPlatform::new(&mut imgui_ctx);
         platform.attach_window(&window, HiDpiMode::Default, &mut imgui_ctx);
 
         let mut renderer = dear_imgui_glow::GlowRenderer::new(gl, &mut imgui_ctx)
             .expect("Creacion de renderer Imgui fallida");
-
-        // Init Imgui
 
         self.state = Some(AppState {
             window,
@@ -148,7 +147,6 @@ impl App {
             billboard_renderer,
             floor_giz_renderer,
             graph_ctx: GraphicsContext {
-                imgui_ctx,
                 platform,
                 renderer,
                 mesh_library,
@@ -160,6 +158,7 @@ impl App {
             floor_gizmo,
             light,
             rain,
+            ui_ctx: UiContext { imgui_ctx },
             ui_state: UiState::new(),
         });
     }

@@ -1,3 +1,5 @@
+use crate::app::ui::build_ui;
+
 use super::*;
 
 impl App {
@@ -50,13 +52,20 @@ impl App {
         //         .draw(&state.renderer.gl, &state.camera, world_pos);
         // }
 
+        //Render ImGui
+
         state
             .graph_ctx
             .platform
-            .prepare_frame(&state.window, &mut state.graph_ctx.imgui_ctx);
-        let ui = state.graph_ctx.imgui_ctx.frame();
-        self.build_ui(
-            state.graph_ctx.gl(),
+            .prepare_frame(&state.window, &mut state.ui_ctx.imgui_ctx);
+
+        let gl = state.graph_ctx.gl();
+        let ui = state.ui_ctx.imgui_ctx.frame();
+
+        build_ui(
+            gl,
+            &state.graph_ctx.texture_library,
+            &mut state.ui_state,
             ui,
             &mut state.scene,
             state.window.inner_size().width as f32,
@@ -65,8 +74,8 @@ impl App {
         state
             .graph_ctx
             .platform
-            .prepare_render(&mut state.graph_ctx.imgui_ctx, &state.window);
-        let draw_data = state.graph_ctx.imgui_ctx.render();
+            .prepare_render(&mut state.ui_ctx.imgui_ctx, &state.window);
+        let draw_data = state.ui_ctx.imgui_ctx.render();
         state.graph_ctx.renderer.render(draw_data);
 
         state.window.request_redraw();

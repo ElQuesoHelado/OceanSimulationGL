@@ -53,11 +53,6 @@ pub fn closest_hit_planes(
 }
 impl AppState {
     pub fn insert_current_primitive(&mut self) {
-        // let material = Material {
-        //     color: self.ui_state.selected_color,
-        //     shininess: 200f32,
-        //     texture_id: self.ui_state.selected_tex_id,
-        // };
         let instance = Instance::new(self.ui_state.mesh_to_draw, self.ui_state.selected_material);
         self.scene.normal_instances.push(instance);
     }

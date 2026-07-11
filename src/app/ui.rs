@@ -185,12 +185,13 @@ pub fn build_ui(
             {
                 let texture_library = &texture_library;
                 for texture_name in texture_library.names.keys() {
-                    if let Some(tex_id) = texture_library.get_id_from_name(texture_name) {
-                        ui_state.selected_material.texture_id = tex_id;
+                    let Some(tex_id) = texture_library.get_id_from_name(texture_name) else {
+                        continue;
+                    };
 
-                        if ui.selectable(texture_name)
-                            && let Some(idx) = ui_state.selected_mesh
-                        {
+                    if ui.selectable(texture_name) {
+                        ui_state.selected_material.texture_id = tex_id;
+                        if let Some(idx) = ui_state.selected_mesh {
                             scene.normal_instances[idx].material.texture_id = tex_id;
                         }
                     }

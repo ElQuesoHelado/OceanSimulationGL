@@ -129,7 +129,8 @@ impl App {
             color: vec3(1f32, 1f32, 1f32),
         };
 
-        let rain = Rain::new(&mut scene, &texture_library, 2000);
+        // let rain = Rain::new(&mut scene, &texture_library, 2000);
+        let rain = Rain::new(&mut scene, &texture_library, 10);
 
         // Init Imgui
         let mut imgui_ctx = dear_imgui_rs::Context::create();
@@ -151,7 +152,6 @@ impl App {
             billboard_renderer,
             floor_giz_renderer,
             graph_ctx: GraphicsContext {
-                platform,
                 renderer,
                 mesh_library,
                 texture_library,
@@ -162,7 +162,10 @@ impl App {
             floor_gizmo,
             light,
             rain,
-            ui_ctx: UiContext { imgui_ctx },
+            ui_ctx: UiContext {
+                imgui_ctx,
+                platform,
+            },
             ui_state: UiState::new(blank_tex_id),
         });
     }

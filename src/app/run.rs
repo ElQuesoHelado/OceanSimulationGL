@@ -8,7 +8,7 @@ impl App {
             return;
         };
 
-        state.rain.update(&mut state.scene, 0.11f32);
+        // state.rain.update(&mut state.scene, 0.11f32);
 
         // state.process_input();
         // state.input.end_frame();
@@ -26,24 +26,25 @@ impl App {
             &state.scene.billboard_instances,
             &state.camera,
         );
-
-        let identity = glam::Mat4::IDENTITY;
-        state.floor_giz_renderer.draw(
-            state.graph_ctx.gl(),
-            &state.floor_gizmo.floor,
-            &identity,
-            &state.camera.view(),
-            &state.camera.projection(),
-            state.floor_gizmo.floor_color,
-        );
-        state.floor_giz_renderer.draw(
-            state.graph_ctx.gl(),
-            &state.floor_gizmo.gizmo,
-            &identity,
-            &state.camera.view(),
-            &state.camera.projection(),
-            state.floor_gizmo.gizmo_color,
-        );
+        //
+        // let identity = glam::Mat4::IDENTITY;
+        // state.floor_giz_renderer.draw(
+        //     state.graph_ctx.gl(),
+        //     &state.floor_gizmo.floor,
+        //     &identity,
+        //     &state.camera.view(),
+        //     &state.camera.projection(),
+        //     state.floor_gizmo.floor_color,
+        // );
+        //
+        // state.floor_giz_renderer.draw(
+        //     state.graph_ctx.gl(),
+        //     &state.floor_gizmo.gizmo,
+        //     &identity,
+        //     &state.camera.view(),
+        //     &state.camera.projection(),
+        //     state.floor_gizmo.gizmo_color,
+        // );
 
         // if let Some(idx) = state.scene.selected {
         //     let world_pos = state.scene.instances[idx].transform.w_axis.truncate();
@@ -55,7 +56,7 @@ impl App {
         //Render ImGui
 
         state
-            .graph_ctx
+            .ui_ctx
             .platform
             .prepare_frame(&state.window, &mut state.ui_ctx.imgui_ctx);
 
@@ -72,7 +73,7 @@ impl App {
             state.window.inner_size().height as f32,
         );
         state
-            .graph_ctx
+            .ui_ctx
             .platform
             .prepare_render(&mut state.ui_ctx.imgui_ctx, &state.window);
         let draw_data = state.ui_ctx.imgui_ctx.render();

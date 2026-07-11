@@ -47,7 +47,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
 }
 
 pub struct GraphicsContext {
-    pub platform: dear_imgui_winit::WinitPlatform,
     pub renderer: dear_imgui_glow::GlowRenderer,
     pub mesh_library: MeshLibrary,
     pub texture_library: TextureLibrary,
@@ -76,6 +75,7 @@ impl GraphicsContext {
 
 pub struct UiContext {
     pub imgui_ctx: dear_imgui_rs::Context,
+    pub platform: dear_imgui_winit::WinitPlatform,
 }
 
 struct UiState {

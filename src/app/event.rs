@@ -13,7 +13,7 @@ impl App {
             return;
         };
 
-        state.graph_ctx.platform.handle_event(
+        state.ui_ctx.platform.handle_event(
             &mut state.ui_ctx.imgui_ctx,
             &state.window,
             &Event::<()>::WindowEvent {
@@ -22,6 +22,9 @@ impl App {
             },
         );
 
+        let want_mouse = state.ui_ctx.imgui_ctx.io().want_capture_mouse();
+        let want_keyboard = state.ui_ctx.imgui_ctx.io().want_capture_keyboard();
+
         match event {
             WindowEvent::CursorMoved { position, .. } => {
                 let (dx, dy) = state.input.on_cursor_moved(position.x, position.y);
@@ -29,6 +32,10 @@ impl App {
                 let alt = state.input.key_pressed(KeyCode::AltLeft);
                 let shift = state.input.key_pressed(KeyCode::ShiftLeft);
                 let left_mouse = state.input.mouse_button_pressed(MouseButton::Left);
+
+                if want_mouse {
+                    return;
+                }
 
                 if alt && left_mouse {
                     state.camera.orbit(dx as f32, dy as f32);
@@ -43,6 +50,10 @@ impl App {
             } => {
                 state.input.on_mouse_button(button, btn_state);
 
+                if want_mouse {
+                    return;
+                }
+
                 if button == MouseButton::Left && btn_state == ElementState::Pressed {
                     let alt = state.input.key_pressed(KeyCode::AltLeft);
                     let shift = state.input.key_pressed(KeyCode::ShiftLeft);
@@ -53,6 +64,10 @@ impl App {
             }
             WindowEvent::KeyboardInput { event, .. } => {
                 use winit::keyboard::{KeyCode, PhysicalKey};
+
+                if want_keyboard {
+                    return;
+                }
 
                 if let PhysicalKey::Code(code) = event.physical_key {
                     state.input.on_keyboard_input(code, event.state);
@@ -67,6 +82,10 @@ impl App {
                 }
             }
             WindowEvent::MouseWheel { delta, .. } => {
+                if want_mouse {
+                    return;
+                }
+
                 let scroll_amount = match delta {
                     winit::event::MouseScrollDelta::LineDelta(_x, y) => y as f64,
                     winit::event::MouseScrollDelta::PixelDelta(pos) => pos.y,

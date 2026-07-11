@@ -1,11 +1,11 @@
 mod app;
 mod camera;
-mod figures;
 mod gizmo;
 mod input_state;
 mod light;
 mod material;
 mod mesh;
+mod mesh_data;
 mod mops;
 mod rain;
 mod renderer;

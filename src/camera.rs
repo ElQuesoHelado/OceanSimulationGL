@@ -46,14 +46,14 @@ impl Camera {
     }
 
     pub fn orbit(&mut self, dx: f32, dy: f32) {
-        self.yaw += dx * 0.3;
-        self.pitch += dy * 0.3;
+        self.yaw += dx * 0.01;
+        self.pitch += dy * 0.01;
 
         self.pitch = self.pitch.clamp(-PI / 2.1f32, PI / 2.1f32);
     }
 
     pub fn zoom(&mut self, delta: f32) {
-        self.distance *= (1.0 - delta * 0.1);
+        self.distance *= (1.0 - delta * 0.01);
         self.distance = self.distance.max(0.1);
     }
 

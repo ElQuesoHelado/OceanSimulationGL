@@ -1,6 +1,6 @@
 use glow::HasContext;
 
-use crate::figures;
+use crate::mesh_data;
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum MeshId {
@@ -24,16 +24,16 @@ pub struct MeshLibrary {
 impl MeshLibrary {
     pub fn new(gl: &glow::Context) -> Self {
         let meshes: Vec<Mesh> = vec![
-            Mesh::upload(gl, figures::cube()),
-            Mesh::upload(gl, figures::cone()),
-            Mesh::upload(gl, figures::cylinder()),
-            Mesh::upload(gl, figures::klein()),
-            Mesh::upload(gl, figures::pen()),
-            Mesh::upload(gl, figures::rock()),
-            Mesh::upload(gl, figures::sphere()),
-            Mesh::upload(gl, figures::tetrahedron()),
-            Mesh::upload(gl, figures::torus()),
-            Mesh::upload(gl, figures::billboard()),
+            Mesh::upload(gl, mesh_data::cube()),
+            Mesh::upload(gl, mesh_data::cone()),
+            Mesh::upload(gl, mesh_data::cylinder()),
+            Mesh::upload(gl, mesh_data::klein()),
+            Mesh::upload(gl, mesh_data::pen()),
+            Mesh::upload(gl, mesh_data::rock()),
+            Mesh::upload(gl, mesh_data::sphere()),
+            Mesh::upload(gl, mesh_data::tetrahedron()),
+            Mesh::upload(gl, mesh_data::torus()),
+            Mesh::upload(gl, mesh_data::billboard()),
         ];
 
         Self { meshes }

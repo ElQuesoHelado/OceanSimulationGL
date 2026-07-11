@@ -31,7 +31,7 @@ impl App {
                 let left_mouse = state.input.mouse_button_pressed(MouseButton::Left);
 
                 if alt && left_mouse {
-                    state.camera.orbit(dx as f32, -dy as f32);
+                    state.camera.orbit(dx as f32, dy as f32);
                 } else if shift && left_mouse {
                     state.camera.pan(dx as f32, dy as f32);
                 }

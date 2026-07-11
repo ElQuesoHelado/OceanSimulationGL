@@ -12,10 +12,10 @@ const MESH_OPTIONS: &[(&str, MeshId)] = &[
     ("Cilindro", MeshId::Cylinder),
     ("Tetraedro", MeshId::Tetrahedron),
     ("Cono", MeshId::Cone),
+    ("Billboard", MeshId::Billboard),
 ];
 
 pub fn build_ui(
-    gl: &glow::Context,
     texture_library: &TextureLibrary,
     ui_state: &mut UiState,
     ui: &Ui,

@@ -68,11 +68,9 @@ impl App {
             .platform
             .prepare_frame(&state.window, &mut state.ui_ctx.imgui_ctx);
 
-        let gl = state.graph_ctx.gl();
         let ui = state.ui_ctx.imgui_ctx.frame();
 
         build_ui(
-            gl,
             &state.graph_ctx.texture_library,
             &mut state.ui_state,
             ui,

@@ -63,7 +63,7 @@ pub fn closest_hit_planes(
 }
 
 impl AppState {
-    pub fn insert_current_primitive(&mut self, mouse_x: f32, mouse_y: f32) {
+    pub fn insert_current_mesh(&mut self, mouse_x: f32, mouse_y: f32) {
         let mut instance =
             Instance::new(self.ui_state.mesh_to_draw, self.ui_state.selected_material);
 
@@ -77,6 +77,9 @@ impl AppState {
             self.camera.projection(),
         ));
 
-        self.scene.normal_instances.push(instance);
+        match self.ui_state.mesh_to_draw {
+            MeshId::Billboard => self.scene.billboard_instances.push(instance),
+            _ => self.scene.normal_instances.push(instance),
+        }
     }
 }

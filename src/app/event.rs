@@ -58,7 +58,7 @@ impl App {
                     let alt = state.input.key_pressed(KeyCode::AltLeft);
                     let shift = state.input.key_pressed(KeyCode::ShiftLeft);
                     if !alt && !shift {
-                        state.insert_current_primitive(
+                        state.insert_current_mesh(
                             state.input.mouse_x as f32,
                             state.input.mouse_y as f32,
                         );

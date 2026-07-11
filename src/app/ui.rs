@@ -20,6 +20,7 @@ pub fn build_ui(
     ui_state: &mut UiState,
     ui: &Ui,
     scene: &mut Scene,
+    light: &mut Light,
     width: f32,
     height: f32,
 ) {
@@ -150,7 +151,7 @@ pub fn build_ui(
                     );
                 }
             }
-            ui.checkbox("Lighting", &mut ui_state.lighting_enabled);
+            ui.checkbox("Lighting", &mut light.enabled);
 
             if ui.button("DUPE")
                 && let Some(idx) = ui_state.selected_mesh

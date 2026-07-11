@@ -79,6 +79,7 @@ impl App {
             gl.debug_message_callback(|_source, _typ, _id, _severity, message| {
                 eprintln!("GL DEBUG: {}", message);
             });
+            gl.enable(glow::DEPTH_TEST);
         }
 
         if let Err(err) = gl_surface
@@ -125,7 +126,8 @@ impl App {
 
         let light = Light {
             enabled: true,
-            pos: vec3(1f32, 1f32, 1f32),
+            //pos: vec3(1f32, 1f32, 1f32),
+            pos: vec3(0f32, 0f32, 0f32),
             color: vec3(1f32, 1f32, 1f32),
         };
 

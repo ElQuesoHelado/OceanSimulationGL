@@ -62,6 +62,7 @@ impl App {
             &mut state.ui_state,
             ui,
             &mut state.scene,
+            &mut state.light,
             state.window.inner_size().width as f32,
             state.window.inner_size().height as f32,
         );

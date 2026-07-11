@@ -73,4 +73,8 @@ impl Scene {
     pub fn get_instance_mut(&mut self, id: usize) -> Option<&mut Instance> {
         self.normal_instances.get_mut(id)
     }
+
+    pub fn get_billboard_instance_mut(&mut self, id: usize) -> Option<&mut Instance> {
+        self.billboard_instances.get_mut(id)
+    }
 }

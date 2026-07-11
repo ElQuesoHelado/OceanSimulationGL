@@ -41,7 +41,7 @@ impl Rain {
             let id = scene.add_billboard_instance(Instance {
                 transform,
                 mesh_id: MeshId::Billboard,
-                material: material.clone(),
+                material,
             });
 
             drops.push(RainDrop {
@@ -57,7 +57,7 @@ impl Rain {
         let mut rng = rand::rng();
 
         for drop in &mut self.drops {
-            let instance = match scene.get_instance_mut(drop.instance_id) {
+            let instance = match scene.get_billboard_instance_mut(drop.instance_id) {
                 Some(instance) => instance,
                 None => {
                     continue;

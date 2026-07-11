@@ -29,7 +29,7 @@ impl App {
 
         let identity = glam::Mat4::IDENTITY;
         state.floor_giz_renderer.draw(
-            &state.graph_ctx.gl(),
+            state.graph_ctx.gl(),
             &state.floor_gizmo.floor,
             &identity,
             &state.camera.view(),
@@ -37,7 +37,7 @@ impl App {
             state.floor_gizmo.floor_color,
         );
         state.floor_giz_renderer.draw(
-            &state.graph_ctx.gl(),
+            state.graph_ctx.gl(),
             &state.floor_gizmo.gizmo,
             &identity,
             &state.camera.view(),

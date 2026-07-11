@@ -136,7 +136,7 @@ impl App {
         let mut platform = dear_imgui_winit::WinitPlatform::new(&mut imgui_ctx);
         platform.attach_window(&window, HiDpiMode::Default, &mut imgui_ctx);
 
-        let mut renderer = dear_imgui_glow::GlowRenderer::new(gl, &mut imgui_ctx)
+        let renderer = dear_imgui_glow::GlowRenderer::new(gl, &mut imgui_ctx)
             .expect("Creacion de renderer Imgui fallida");
 
         let blank_tex_id = texture_library

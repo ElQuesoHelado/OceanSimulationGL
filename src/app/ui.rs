@@ -42,9 +42,9 @@ pub fn build_ui(
 
             ui.separator();
 
-            let mut color = ui_state.selected_color.to_array();
+            let mut color = ui_state.selected_material.color.to_array();
             if ui.color_edit4("Col", &mut color) {
-                ui_state.selected_color = Vec4::from_array(color);
+                ui_state.selected_material.color = Vec4::from_array(color);
             }
 
             if ui.button("Paint")
@@ -54,7 +54,7 @@ pub fn build_ui(
                     &mut scene.normal_instances[idx].material.color,
                     &mut ui_state.buffered_color,
                 );
-                scene.normal_instances[idx].material.color = ui_state.selected_color;
+                scene.normal_instances[idx].material.color = ui_state.selected_material.color;
                 ui_state.selected_mesh = None;
             }
 
@@ -185,18 +185,19 @@ pub fn build_ui(
             {
                 let texture_library = &texture_library;
                 for texture_name in texture_library.names.keys() {
-                    if ui.selectable(texture_name)
-                        && let Some(idx) = ui_state.selected_mesh
-                        && let Some(tex_id) = texture_library.get_id_from_name(texture_name)
-                    {
-                        scene.normal_instances[idx].material.texture_id = tex_id;
+                    if let Some(tex_id) = texture_library.get_id_from_name(texture_name) {
+                        ui_state.selected_material.texture_id = tex_id;
+
+                        if ui.selectable(texture_name)
+                            && let Some(idx) = ui_state.selected_mesh
+                        {
+                            scene.normal_instances[idx].material.texture_id = tex_id;
+                        }
                     }
                 }
             }
         });
 }
-
-impl App {}
 
 fn with_selected(ui_state: &UiState, scene: &mut Scene, f: impl FnOnce(&mut Instance)) {
     if let Some(idx) = ui_state.selected_mesh {

@@ -1,4 +1,4 @@
-use winit::event::Event;
+use winit::event::{ElementState, Event};
 
 use super::*;
 
@@ -24,7 +24,17 @@ impl App {
 
         match event {
             WindowEvent::CursorMoved { position, .. } => {
-                state.input.on_cursor_moved(position.x, position.y);
+                let (dx, dy) = state.input.on_cursor_moved(position.x, position.y);
+
+                let alt = state.input.key_pressed(KeyCode::AltLeft);
+                let shift = state.input.key_pressed(KeyCode::ShiftLeft);
+                let left_mouse = state.input.mouse_button_pressed(MouseButton::Left);
+
+                if alt && left_mouse {
+                    state.camera.orbit(dx as f32, -dy as f32);
+                } else if shift && left_mouse {
+                    state.camera.pan(dx as f32, dy as f32);
+                }
             }
             WindowEvent::MouseInput {
                 button,
@@ -32,16 +42,28 @@ impl App {
                 ..
             } => {
                 state.input.on_mouse_button(button, btn_state);
+
+                if button == MouseButton::Left && btn_state == ElementState::Pressed {
+                    let alt = state.input.key_pressed(KeyCode::AltLeft);
+                    let shift = state.input.key_pressed(KeyCode::ShiftLeft);
+                    if !alt && !shift {
+                        state.insert_current_primitive();
+                    }
+                }
             }
             WindowEvent::KeyboardInput { event, .. } => {
                 use winit::keyboard::{KeyCode, PhysicalKey};
 
                 if let PhysicalKey::Code(code) = event.physical_key {
+                    state.input.on_keyboard_input(code, event.state);
+
                     if code == KeyCode::Escape {
                         event_loop.exit();
                     }
 
-                    state.input.on_keyboard_input(code, event.state);
+                    if event.state == ElementState::Pressed && !event.repeat {
+                        // state.handle_selection_key(code);
+                    }
                 }
             }
             WindowEvent::MouseWheel { delta, .. } => {

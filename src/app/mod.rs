@@ -1,5 +1,6 @@
 mod config;
 mod event;
+mod input;
 mod run;
 mod ui;
 
@@ -80,18 +81,22 @@ pub struct UiContext {
 struct UiState {
     mesh_to_draw: MeshId,
     selected_mesh: Option<usize>,
-    selected_color: glam::Vec4,
+    selected_material: Material,
     buffered_color: glam::Vec4,
     wireframe_enabled: bool,
     lighting_enabled: bool,
 }
 
 impl UiState {
-    pub fn new() -> Self {
+    pub fn new(default_texture_id: u32) -> Self {
         Self {
             mesh_to_draw: MeshId::Cube,
             selected_mesh: None,
-            selected_color: vec4(1f32, 1f32, 1f32, 1f32),
+            selected_material: Material {
+                color: vec4(1f32, 1f32, 1f32, 1f32),
+                shininess: 200f32,
+                texture_id: default_texture_id,
+            },
             buffered_color: vec4(1f32, 1f32, 1f32, 1f32),
             wireframe_enabled: false,
             lighting_enabled: false,
@@ -116,37 +121,6 @@ struct AppState {
     rain: Rain,
     ui_ctx: UiContext,
     ui_state: UiState,
-}
-
-impl AppState {
-    pub fn process_input(&mut self) {
-        let alt = self.input.key_pressed(KeyCode::AltLeft);
-        let shift = self.input.key_pressed(KeyCode::ShiftLeft);
-        let left_pressed = self.input.mouse_button_pressed(MouseButton::Left);
-        let w = self.input.key_pressed(KeyCode::KeyW);
-        let s = self.input.key_pressed(KeyCode::KeyS);
-        let a = self.input.key_pressed(KeyCode::KeyA);
-        let d = self.input.key_pressed(KeyCode::KeyD);
-
-        if alt && left_pressed {
-            self.camera.orbit(
-                self.input.mouse_dx as f32 * 0.1,
-                self.input.mouse_dy as f32 * 0.1,
-            );
-            return;
-        } else if shift && left_pressed {
-            self.camera
-                .pan(self.input.mouse_dx as f32, self.input.mouse_dy as f32);
-            return;
-        }
-        //TODO:
-        if d {
-            self.camera.target.x += 0.1;
-        }
-        if a {
-            self.camera.target.x -= 0.1;
-        }
-    }
 }
 
 struct App {

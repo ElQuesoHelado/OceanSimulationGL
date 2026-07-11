@@ -115,10 +115,10 @@ impl App {
 
         let mut scene = Scene::new();
 
-        let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "hinojosa")
-            .expect("Textura no encontrada"); //TODO: en UI no hacer panic?
+        // let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "hinojosa")
+        //     .expect("Textura no encontrada"); //TODO: en UI no hacer panic?
 
-        scene.add_normal_instance(Instance::new(MeshId::Cube, material));
+        //scene.add_normal_instance(Instance::new(MeshId::Cube, material));
 
         let size = window.inner_size();
         let camera = Camera::new(size.width as f32 / size.height as f32);
@@ -138,6 +138,10 @@ impl App {
 
         let mut renderer = dear_imgui_glow::GlowRenderer::new(gl, &mut imgui_ctx)
             .expect("Creacion de renderer Imgui fallida");
+
+        let blank_tex_id = texture_library
+            .get_id_from_name("blank")
+            .expect("No existe textura default(blank)");
 
         self.state = Some(AppState {
             window,
@@ -159,7 +163,7 @@ impl App {
             light,
             rain,
             ui_ctx: UiContext { imgui_ctx },
-            ui_state: UiState::new(),
+            ui_state: UiState::new(blank_tex_id),
         });
     }
 }

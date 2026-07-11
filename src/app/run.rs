@@ -10,8 +10,8 @@ impl App {
 
         state.rain.update(&mut state.scene, 0.11f32);
 
-        state.process_input();
-        state.input.end_frame();
+        // state.process_input();
+        // state.input.end_frame();
 
         state.graph_ctx.clear();
         state.standard_renderer.draw(

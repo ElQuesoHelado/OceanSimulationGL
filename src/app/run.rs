@@ -26,32 +26,25 @@ impl App {
             &state.scene.billboard_instances,
             &state.camera,
         );
-        //
-        // let identity = glam::Mat4::IDENTITY;
-        // state.floor_giz_renderer.draw(
-        //     state.graph_ctx.gl(),
-        //     &state.floor_gizmo.floor,
-        //     &identity,
-        //     &state.camera.view(),
-        //     &state.camera.projection(),
-        //     state.floor_gizmo.floor_color,
-        // );
-        //
-        // state.floor_giz_renderer.draw(
-        //     state.graph_ctx.gl(),
-        //     &state.floor_gizmo.gizmo,
-        //     &identity,
-        //     &state.camera.view(),
-        //     &state.camera.projection(),
-        //     state.floor_gizmo.gizmo_color,
-        // );
 
-        // if let Some(idx) = state.scene.selected {
-        //     let world_pos = state.scene.instances[idx].transform.w_axis.truncate();
-        //     state
-        //         .gizmo
-        //         .draw(&state.renderer.gl, &state.camera, world_pos);
-        // }
+        let identity = glam::Mat4::IDENTITY;
+        state.floor_giz_renderer.draw(
+            state.graph_ctx.gl(),
+            &state.floor_gizmo.floor,
+            &identity,
+            &state.camera.view(),
+            &state.camera.projection(),
+            state.floor_gizmo.floor_color,
+        );
+
+        state.floor_giz_renderer.draw(
+            state.graph_ctx.gl(),
+            &state.floor_gizmo.gizmo,
+            &identity,
+            &state.camera.view(),
+            &state.camera.projection(),
+            state.floor_gizmo.gizmo_color,
+        );
 
         //Render ImGui
 

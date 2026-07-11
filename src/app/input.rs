@@ -15,8 +15,8 @@ fn un_project(win: Vec3, view: Mat4, proj: Mat4, viewport: (f32, f32, f32, f32))
 }
 
 pub fn closest_hit_planes(
-    x: f32,
-    y: f32,
+    mouse_x: f32,
+    mouse_y: f32,
     width: f32,
     height: f32,
     camera_position: Vec3,
@@ -25,8 +25,18 @@ pub fn closest_hit_planes(
 ) -> Vec3 {
     let viewport = (0.0, 0.0, width, height);
 
-    let near_point = un_project(Vec3::new(x, height - y, 0.0), view, proj, viewport);
-    let far_point = un_project(Vec3::new(x, height - y, 1000.0), view, proj, viewport);
+    let near_point = un_project(
+        Vec3::new(mouse_x, height - mouse_y, 0.0),
+        view,
+        proj,
+        viewport,
+    );
+    let far_point = un_project(
+        Vec3::new(mouse_x, height - mouse_y, 1000.0),
+        view,
+        proj,
+        viewport,
+    );
 
     let origin = camera_position;
     let direction = (far_point - near_point).normalize();
@@ -51,9 +61,22 @@ pub fn closest_hit_planes(
         hit_yz
     }
 }
+
 impl AppState {
-    pub fn insert_current_primitive(&mut self) {
-        let instance = Instance::new(self.ui_state.mesh_to_draw, self.ui_state.selected_material);
+    pub fn insert_current_primitive(&mut self, mouse_x: f32, mouse_y: f32) {
+        let mut instance =
+            Instance::new(self.ui_state.mesh_to_draw, self.ui_state.selected_material);
+
+        instance.transform.translate(closest_hit_planes(
+            mouse_x,
+            mouse_y,
+            self.window.inner_size().width as f32,
+            self.window.inner_size().height as f32,
+            self.camera.eye(),
+            self.camera.view(),
+            self.camera.projection(),
+        ));
+
         self.scene.normal_instances.push(instance);
     }
 }

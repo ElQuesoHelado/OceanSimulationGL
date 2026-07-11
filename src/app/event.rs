@@ -58,10 +58,24 @@ impl App {
                     let alt = state.input.key_pressed(KeyCode::AltLeft);
                     let shift = state.input.key_pressed(KeyCode::ShiftLeft);
                     if !alt && !shift {
-                        state.insert_current_mesh(
-                            state.input.mouse_x as f32,
-                            state.input.mouse_y as f32,
-                        );
+                        match state.ui_state.click_mode {
+                            ClickMode::Insert => state.insert_current_mesh(
+                                state.input.mouse_x as f32,
+                                state.input.mouse_y as f32,
+                            ),
+                            ClickMode::Select => {
+                                let Some(instance) = state.select_instance(
+                                    state.input.mouse_x as f32,
+                                    state.input.mouse_y as f32,
+                                ) else {
+                                    return;
+                                };
+
+                                // if (state.ui_state.selected_mesh == ) {}
+
+                                let x = 5;
+                            }
+                        }
                     }
                 }
             }

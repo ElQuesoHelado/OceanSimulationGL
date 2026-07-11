@@ -49,14 +49,14 @@ pub fn build_ui(
             }
 
             if ui.button("Paint")
-                && let Some(idx) = ui_state.selected_mesh
+                && let Some(idx) = ui_state.selected_instance
             {
                 std::mem::swap(
                     &mut scene.normal_instances[idx].material.color,
                     &mut ui_state.buffered_color,
                 );
                 scene.normal_instances[idx].material.color = ui_state.selected_material.color;
-                ui_state.selected_mesh = None;
+                ui_state.selected_instance = None;
             }
 
             ui.separator();
@@ -143,7 +143,7 @@ pub fn build_ui(
             ui.checkbox("Lighting", &mut light.enabled);
 
             if ui.button("DUPE")
-                && let Some(idx) = ui_state.selected_mesh
+                && let Some(idx) = ui_state.selected_instance
             {
                 std::mem::swap(
                     &mut scene.normal_instances[idx].material.color,
@@ -151,17 +151,17 @@ pub fn build_ui(
                 );
                 let dup = scene.normal_instances[idx].clone();
                 scene.normal_instances.push(dup);
-                ui_state.selected_mesh = None;
+                ui_state.selected_instance = None;
             }
             if ui.button("DEL")
-                && let Some(idx) = ui_state.selected_mesh
+                && let Some(idx) = ui_state.selected_instance
             {
                 std::mem::swap(
                     &mut scene.normal_instances[idx].material.color,
                     &mut ui_state.buffered_color,
                 );
                 scene.normal_instances.remove(idx);
-                ui_state.selected_mesh = None;
+                ui_state.selected_instance = None;
             }
 
             ui.separator();
@@ -181,7 +181,7 @@ pub fn build_ui(
 
                     if ui.selectable(texture_name) {
                         ui_state.selected_material.texture_id = tex_id;
-                        if let Some(idx) = ui_state.selected_mesh {
+                        if let Some(idx) = ui_state.selected_instance {
                             scene.normal_instances[idx].material.texture_id = tex_id;
                         }
                     }
@@ -191,7 +191,7 @@ pub fn build_ui(
 }
 
 fn with_selected(ui_state: &UiState, scene: &mut Scene, f: impl FnOnce(&mut Instance)) {
-    if let Some(idx) = ui_state.selected_mesh {
+    if let Some(idx) = ui_state.selected_instance {
         f(&mut scene.normal_instances[idx]);
     }
 }

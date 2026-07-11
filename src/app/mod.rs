@@ -73,6 +73,11 @@ impl GraphicsContext {
     }
 }
 
+pub enum ClickMode {
+    Insert,
+    Select,
+}
+
 pub struct UiContext {
     pub imgui_ctx: dear_imgui_rs::Context,
     pub platform: dear_imgui_winit::WinitPlatform,
@@ -80,18 +85,19 @@ pub struct UiContext {
 
 struct UiState {
     mesh_to_draw: MeshId,
-    selected_mesh: Option<usize>,
+    selected_instance: Option<usize>,
     selected_material: Material,
     buffered_color: glam::Vec4,
     wireframe_enabled: bool,
     lighting_enabled: bool,
+    click_mode: ClickMode,
 }
 
 impl UiState {
     pub fn new(default_texture_id: u32) -> Self {
         Self {
             mesh_to_draw: MeshId::Cube,
-            selected_mesh: None,
+            selected_instance: None,
             selected_material: Material {
                 color: vec4(1f32, 1f32, 1f32, 1f32),
                 shininess: 200f32,
@@ -100,6 +106,7 @@ impl UiState {
             buffered_color: vec4(1f32, 1f32, 1f32, 1f32),
             wireframe_enabled: false,
             lighting_enabled: false,
+            click_mode: ClickMode::Insert,
         }
     }
 }

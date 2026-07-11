@@ -1,3 +1,4 @@
+use glam::{Vec3, Vec3Swizzles, vec3};
 use glow::HasContext;
 
 use crate::mesh_data;
@@ -48,12 +49,44 @@ impl MeshLibrary {
     }
 }
 
+pub struct AABB {
+    pub min_point: glam::Vec3,
+    pub max_point: glam::Vec3,
+}
+
+impl AABB {
+    pub fn new(positions: &[[f32; 3]]) -> Self {
+        let Some(first) = positions.first() else {
+            return Self {
+                min_point: vec3(0.0, 0.0, 0.0),
+                max_point: vec3(0.0, 0.0, 0.0),
+            };
+        };
+
+        let first = Vec3::from_slice(first);
+
+        let (min_point, max_point) =
+            positions
+                .iter()
+                .fold((first, first), |(min, max), &[x, y, z]| {
+                    let p = vec3(x, y, z);
+                    (min.min(p), max.max(p))
+                });
+
+        Self {
+            min_point,
+            max_point,
+        }
+    }
+}
+
 // Datos crudos de un mesh(Cube, Sphere, ...)
 pub struct MeshData {
     pub positions: &'static [[f32; 3]],
     pub normals: &'static [[f32; 3]],
     pub texcoords: &'static [[f32; 2]],
     pub indices: &'static [u32],
+    pub aabb: AABB,
 }
 
 // Mesh cargado
@@ -64,6 +97,7 @@ pub struct Mesh {
     vbo_texcoords: glow::Buffer,
     ebo: glow::Buffer,
     index_count: i32,
+    pub data: MeshData,
 }
 
 impl Mesh {
@@ -133,6 +167,7 @@ impl Mesh {
                 vbo_texcoords,
                 ebo,
                 index_count: data.indices.len() as i32,
+                data,
             }
         }
     }

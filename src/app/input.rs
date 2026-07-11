@@ -23,23 +23,8 @@ pub fn closest_hit_planes(
     view: Mat4,
     proj: Mat4,
 ) -> Vec3 {
-    let viewport = (0.0, 0.0, width, height);
-
-    let near_point = un_project(
-        Vec3::new(mouse_x, height - mouse_y, 0.0),
-        view,
-        proj,
-        viewport,
-    );
-    let far_point = un_project(
-        Vec3::new(mouse_x, height - mouse_y, 1000.0),
-        view,
-        proj,
-        viewport,
-    );
-
     let origin = camera_position;
-    let direction = (far_point - near_point).normalize();
+    let (_, direction) = get_ray(mouse_x, mouse_y, width, height, view, proj);
 
     let t_xz = -origin.y / direction.y;
     let t_yz = -origin.x / direction.x;
@@ -62,6 +47,105 @@ pub fn closest_hit_planes(
     }
 }
 
+// (near, dir)
+fn get_ray(
+    mouse_x: f32,
+    mouse_y: f32,
+    width: f32,
+    height: f32,
+    view: Mat4,
+    proj: Mat4,
+) -> (Vec3, Vec3) {
+    let viewport = (0.0, 0.0, width, height);
+
+    let near = un_project(
+        Vec3::new(mouse_x, height - mouse_y, 0.0),
+        view,
+        proj,
+        viewport,
+    );
+    let far = un_project(
+        Vec3::new(mouse_x, height - mouse_y, 1000.0),
+        view,
+        proj,
+        viewport,
+    );
+
+    (near, (far - near).normalize())
+}
+
+fn ray_hits_aabb(origin: Vec3, dir: Vec3, min: Vec3, max: Vec3) -> bool {
+    let mut t_min = f32::MIN;
+    let mut t_max = f32::MAX;
+
+    for i in 0..3 {
+        let inv = 1.0 / dir[i];
+        let mut t1 = (min[i] - origin[i]) * inv;
+        let mut t2 = (max[i] - origin[i]) * inv;
+        if t1 > t2 {
+            std::mem::swap(&mut t1, &mut t2);
+        }
+        t_min = t_min.max(t1);
+        t_max = t_max.min(t2);
+    }
+
+    t_max >= t_min && t_max >= 0.0
+}
+
+fn ray_to_local(origin: Vec3, dir: Vec3, model: Mat4) -> (Vec3, Vec3) {
+    let inv = model.inverse();
+    let local_origin = inv.transform_point3(origin);
+    let local_dir = inv.transform_vector3(dir); // ya maneja el w=0 por vos
+    (local_origin, local_dir.normalize())
+}
+
+pub fn select_mesh<'a>(
+    ray_origin: Vec3,
+    ray_dir: Vec3,
+    instances: &'a [Instance],
+    mesh_library: &MeshLibrary,
+) -> Option<&'a Instance> {
+    instances
+        .iter()
+        .filter(|m| {
+            let (lo, ld) = ray_to_local(ray_origin, ray_dir, m.transform.mat);
+
+            let Some(mesh) = mesh_library.get(m.mesh_id) else {
+                return false;
+            };
+
+            ray_hits_aabb(lo, ld, mesh.data.aabb.min_point, mesh.data.aabb.max_point)
+        })
+        .min_by(|a, b| {
+            let mesh_a = mesh_library.get(a.mesh_id).unwrap();
+            let mesh_b = mesh_library.get(b.mesh_id).unwrap();
+
+            let center_a = mesh_a
+                .data
+                .aabb
+                .min_point
+                .midpoint(mesh_a.data.aabb.max_point);
+            let center_b = mesh_b
+                .data
+                .aabb
+                .min_point
+                .midpoint(mesh_b.data.aabb.max_point);
+
+            let dist_a = a
+                .transform
+                .mat
+                .transform_point3(center_a)
+                .distance(ray_origin);
+            let dist_b = b
+                .transform
+                .mat
+                .transform_point3(center_b)
+                .distance(ray_origin);
+
+            dist_a.total_cmp(&dist_b)
+        })
+}
+
 impl AppState {
     pub fn insert_current_mesh(&mut self, mouse_x: f32, mouse_y: f32) {
         let mut instance =
@@ -81,5 +165,22 @@ impl AppState {
             MeshId::Billboard => self.scene.billboard_instances.push(instance),
             _ => self.scene.normal_instances.push(instance),
         }
+    }
+
+    pub fn select_instance(&self, mouse_x: f32, mouse_y: f32) -> Option<&Instance> {
+        select_mesh(
+            self.camera.eye(),
+            get_ray(
+                mouse_x,
+                mouse_y,
+                self.window.inner_size().width as f32,
+                self.window.inner_size().width as f32,
+                self.camera.view(),
+                self.camera.projection(),
+            )
+            .1,
+            &self.scene.normal_instances,
+            &self.graph_ctx.mesh_library,
+        )
     }
 }

@@ -8,6 +8,15 @@ impl App {
             return;
         };
 
+        if state.ui_state.wireframe_enabled {
+            unsafe {
+                state
+                    .graph_ctx
+                    .gl()
+                    .polygon_mode(glow::FRONT_AND_BACK, glow::LINE);
+            }
+        }
+
         // state.rain.update(&mut state.scene, 0.11f32);
 
         // state.process_input();
@@ -47,6 +56,13 @@ impl App {
         );
 
         //Render ImGui
+
+        unsafe {
+            state
+                .graph_ctx
+                .gl()
+                .polygon_mode(glow::FRONT_AND_BACK, glow::FILL);
+        }
 
         state
             .ui_ctx

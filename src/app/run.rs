@@ -56,7 +56,6 @@ impl App {
         );
 
         //Render ImGui
-
         unsafe {
             state
                 .graph_ctx

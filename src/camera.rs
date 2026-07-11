@@ -19,8 +19,8 @@ impl Camera {
     pub fn new(aspect: f32) -> Self {
         Self {
             target: Vec3::new(0., 0., 0.),
-            distance: 5.,
-            yaw: 0.0,
+            distance: 8.,
+            yaw: 0.5,
             pitch: 0.3,
             fov_v: 90f32.to_radians(),
             aspect,

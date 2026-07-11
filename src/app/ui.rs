@@ -139,18 +139,7 @@ pub fn build_ui(
             ui.separator();
             ui.text("MISCS");
 
-            if ui.checkbox("Wireframe", &mut ui_state.wireframe_enabled) {
-                // unsafe {
-                //     gl.polygon_mode(
-                //         glow::FRONT_AND_BACK,
-                //         if ui_state.wireframe_enabled {
-                //             glow::LINE
-                //         } else {
-                //             glow::FILL
-                //         },
-                //     );
-                // }
-            }
+            ui.checkbox("Wireframe", &mut ui_state.wireframe_enabled);
             ui.checkbox("Lighting", &mut light.enabled);
 
             if ui.button("DUPE")

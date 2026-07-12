@@ -1,9 +1,11 @@
+mod ocean;
 mod rain;
 
 use crate::{scene::Scene, simulations::rain::Rain, texture::TextureLibrary};
 
 pub struct Simulation {
     rain: Rain,
+    //ocean: Ocean,
 }
 
 impl Simulation {

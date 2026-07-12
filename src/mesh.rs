@@ -143,4 +143,21 @@ impl Mesh {
             }
         }
     }
+    
+    pub fn draw(&self, gl: &glow::Context) {
+        unsafe {
+            gl.bind_vertex_array(Some(self.vao));
+            gl.draw_elements(glow::TRIANGLES, self.index_count, glow::UNSIGNED_INT, 0);
+        }
+    }
+
+    pub fn destroy(&self, gl: &glow::Context) {
+        unsafe {
+            gl.delete_vertex_array(self.vao);
+            gl.delete_buffer(self.vbo_positions);
+            gl.delete_buffer(self.vbo_normals);
+            gl.delete_buffer(self.vbo_texcoords);
+            gl.delete_buffer(self.ebo);
+        }
+    }
 }

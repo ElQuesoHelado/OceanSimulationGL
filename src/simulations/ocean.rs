@@ -9,8 +9,9 @@ struct Wave {
 
 pub struct Ocean {
     time: f32,
-    npoints: usize,
+    // npoints: usize,
     instance_id: usize,
+    waves: Vec<Wave>,
 }
 
 impl Ocean {

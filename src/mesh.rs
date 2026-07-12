@@ -143,7 +143,7 @@ impl Mesh {
             }
         }
     }
-    
+
     pub fn draw(&self, gl: &glow::Context) {
         unsafe {
             gl.bind_vertex_array(Some(self.vao));
@@ -159,5 +159,33 @@ impl Mesh {
             gl.delete_buffer(self.vbo_texcoords);
             gl.delete_buffer(self.ebo);
         }
+    }
+}
+
+impl MeshLibrary {
+    pub fn new(gl: &glow::Context) -> Self {
+        let meshes: Vec<Mesh> = vec![
+            Mesh::upload(gl, mesh_data::cube()),
+            Mesh::upload(gl, mesh_data::cone()),
+            Mesh::upload(gl, mesh_data::cylinder()),
+            Mesh::upload(gl, mesh_data::klein()),
+            Mesh::upload(gl, mesh_data::pen()),
+            Mesh::upload(gl, mesh_data::rock()),
+            Mesh::upload(gl, mesh_data::sphere()),
+            Mesh::upload(gl, mesh_data::tetrahedron()),
+            Mesh::upload(gl, mesh_data::torus()),
+            Mesh::upload(gl, mesh_data::billboard()),
+            Mesh::upload(gl, mesh_data::plane(2000)),
+        ];
+
+        Self { meshes }
+    }
+
+    pub fn add(&mut self, gl: &glow::Context, data: MeshData) {
+        self.meshes.push(Mesh::upload(gl, data));
+    }
+
+    pub fn get(&self, id: MeshId) -> Option<&Mesh> {
+        self.meshes.get(id as usize)
     }
 }

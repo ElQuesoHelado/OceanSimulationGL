@@ -18,9 +18,37 @@ pub enum MeshId {
     Plane,
 }
 
-// Duenia de todos los meshes base
+// Bebita de todos los meshes base
 pub struct MeshLibrary {
     meshes: Vec<Mesh>,
+}
+
+impl MeshLibrary {
+    pub fn new(gl: &glow::Context) -> Self {
+        let meshes: Vec<Mesh> = vec![
+            Mesh::upload(gl, mesh_data::cube()),
+            Mesh::upload(gl, mesh_data::cone()),
+            Mesh::upload(gl, mesh_data::cylinder()),
+            Mesh::upload(gl, mesh_data::klein()),
+            Mesh::upload(gl, mesh_data::pen()),
+            Mesh::upload(gl, mesh_data::rock()),
+            Mesh::upload(gl, mesh_data::sphere()),
+            Mesh::upload(gl, mesh_data::tetrahedron()),
+            Mesh::upload(gl, mesh_data::torus()),
+            Mesh::upload(gl, mesh_data::billboard()),
+            Mesh::upload(gl, mesh_data::plane(2000)),
+        ];
+
+        Self { meshes }
+    }
+
+    pub fn add(&mut self, gl: &glow::Context, data: MeshData) {
+        self.meshes.push(Mesh::upload(gl, data));
+    }
+
+    pub fn get(&self, id: MeshId) -> Option<&Mesh> {
+        self.meshes.get(id as usize)
+    }
 }
 
 pub struct AABB {
@@ -54,7 +82,7 @@ impl AABB {
     }
 }
 
-// Datos crudos de un mesh (Cubo, Esfera, ...)
+// Datos crudos de un mesh(Cube, Sphere, ...)
 pub struct MeshData {
     pub positions: &'static [[f32; 3]],
     pub normals: &'static [[f32; 3]],
@@ -63,7 +91,7 @@ pub struct MeshData {
     pub aabb: AABB,
 }
 
-// Mesh ya cargado en la GPU
+// Mesh cargado
 pub struct Mesh {
     vao: glow::VertexArray,
     vbo_positions: glow::Buffer,
@@ -113,6 +141,8 @@ impl Mesh {
                 glow::STATIC_DRAW,
             );
 
+            // println!("{:?}\n\n", data.indices);
+
             // posiciones -> binding 0
             gl.vertex_array_vertex_buffer(vao, 0, Some(vbo_positions), 0, 3 * 4);
             gl.enable_vertex_array_attrib(vao, 0);
@@ -145,6 +175,7 @@ impl Mesh {
     }
 
     pub fn draw(&self, gl: &glow::Context) {
+        // println!("{}", self.index_count);
         unsafe {
             gl.bind_vertex_array(Some(self.vao));
             gl.draw_elements(glow::TRIANGLES, self.index_count, glow::UNSIGNED_INT, 0);
@@ -162,33 +193,6 @@ impl Mesh {
     }
 }
 
-impl MeshLibrary {
-    pub fn new(gl: &glow::Context) -> Self {
-        let meshes: Vec<Mesh> = vec![
-            Mesh::upload(gl, mesh_data::cube()),
-            Mesh::upload(gl, mesh_data::cone()),
-            Mesh::upload(gl, mesh_data::cylinder()),
-            Mesh::upload(gl, mesh_data::klein()),
-            Mesh::upload(gl, mesh_data::pen()),
-            Mesh::upload(gl, mesh_data::rock()),
-            Mesh::upload(gl, mesh_data::sphere()),
-            Mesh::upload(gl, mesh_data::tetrahedron()),
-            Mesh::upload(gl, mesh_data::torus()),
-            Mesh::upload(gl, mesh_data::billboard()),
-            Mesh::upload(gl, mesh_data::plane(2000)),
-        ];
-
-        Self { meshes }
-    }
-
-    pub fn add(&mut self, gl: &glow::Context, data: MeshData) {
-        self.meshes.push(Mesh::upload(gl, data));
-    }
-
-    pub fn get(&self, id: MeshId) -> Option<&Mesh> {
-        self.meshes.get(id as usize)
-    }
-}
 pub struct SimpleMesh {
     vao: glow::VertexArray,
     vbo: glow::Buffer,
@@ -202,6 +206,7 @@ impl SimpleMesh {
             let vao = gl.create_vertex_array().unwrap();
             let vbo = gl.create_buffer().unwrap();
 
+            // Materializa los objetos (glow usa Gen* por debajo, no Create*)
             gl.bind_vertex_array(Some(vao));
             gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
             gl.bind_vertex_array(None);

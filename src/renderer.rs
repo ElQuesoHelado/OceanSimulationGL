@@ -1,0 +1,174 @@
+use glam::{Mat4, Vec3, camera};
+use glow::HasContext;
+
+use crate::{
+    app::GraphicsContext,
+    camera::Camera,
+    light::Light,
+    mesh::{MeshLibrary, SimpleMesh},
+    scene::Instance,
+    shader::Shader,
+};
+
+// Figuras 3D
+pub struct StandardRenderer {
+    shader: Shader,
+}
+impl StandardRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        let shader = Shader::new(gl, vertex_path, frag_path)?;
+        shader.activate(gl);
+        shader.set_int(gl, "uTexture", 0);
+
+        Ok(Self { shader })
+    }
+
+    pub fn draw(
+        &self,
+        ctx: &GraphicsContext,
+        instances: &[Instance],
+        camera: &Camera,
+        light: &Light,
+    ) {
+        let gl = ctx.gl();
+
+        self.shader.activate(gl);
+        self.shader.set_mat4(gl, "uView", &camera.view());
+        self.shader
+            .set_mat4(gl, "uProjection", &camera.projection());
+        self.shader.set_bool(gl, "uLightingEnabled", light.enabled);
+        self.shader.set_vec3(gl, "uLightPos", &light.pos);
+        self.shader.set_vec3(gl, "uLightColor", &light.color);
+        self.shader.set_vec3(gl, "uEye", &camera.eye());
+
+        for inst in instances {
+            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_vec4(gl, "uColor", &inst.material.color);
+            self.shader
+                .set_float(gl, "uShininess", inst.material.shininess);
+
+            unsafe {
+                gl.active_texture(glow::TEXTURE0);
+                gl.bind_texture(
+                    glow::TEXTURE_2D,
+                    ctx.texture_library
+                        .get_texture_from_id(inst.material.texture_id)
+                        .map(|tex| tex.id),
+                );
+            }
+
+            match ctx.mesh_library.get(inst.mesh_id) {
+                Some(v) => v.draw(gl),
+                None => continue,
+            };
+        }
+    }
+}
+
+pub struct BillboardRenderer {
+    shader: Shader,
+    floor_vertices: [Vec3; 6],
+    giz_pts: [Vec3; 6],
+}
+
+impl BillboardRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        let shader = Shader::new(gl, vertex_path, frag_path)?;
+
+        shader.activate(gl);
+        shader.set_int(gl, "uTexture", 0);
+
+        Ok(Self {
+            shader,
+            floor_vertices: [
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 1000.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 1000.0),
+                Vec3::new(0.0, 0.0, 1000.0),
+            ],
+            giz_pts: [
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(1000.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 1000.0, 0.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1000.0),
+            ],
+        })
+    }
+
+    pub fn draw(&self, ctx: &GraphicsContext, instances: &[Instance], camera: &Camera) {
+        let gl = ctx.gl();
+
+        self.shader.activate(gl);
+
+        self.shader.set_mat4(gl, "uView", &camera.view());
+
+        self.shader
+            .set_mat4(gl, "uProjection", &camera.projection());
+
+        unsafe {
+            gl.enable(glow::BLEND);
+            gl.blend_func(glow::SRC_ALPHA, glow::ONE_MINUS_SRC_ALPHA);
+
+            // Seguimos usando el depth buffer
+            gl.depth_mask(true);
+        }
+
+        for inst in instances {
+            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+
+            self.shader.set_vec4(gl, "uColor", &inst.material.color);
+
+            unsafe {
+                gl.active_texture(glow::TEXTURE0);
+
+                gl.bind_texture(
+                    glow::TEXTURE_2D,
+                    ctx.texture_library
+                        .get_texture_from_id(inst.material.texture_id)
+                        .map(|tex| tex.id),
+                );
+            }
+
+            if let Some(mesh) = ctx.mesh_library.get(inst.mesh_id) {
+                mesh.draw(gl);
+            }
+        }
+
+        unsafe {
+            gl.disable(glow::BLEND);
+        }
+    }
+}
+
+pub struct SimpleColorRenderer {
+    shader: Shader,
+}
+
+impl SimpleColorRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        Ok(Self {
+            shader: Shader::new(gl, vertex_path, frag_path)?,
+        })
+    }
+
+    pub fn draw(
+        &self,
+        gl: &glow::Context,
+        mesh: &SimpleMesh,
+        model: &glam::Mat4,
+        view: &glam::Mat4,
+        proj: &glam::Mat4,
+        color: glam::Vec3,
+    ) {
+        self.shader.activate(gl);
+        self.shader.set_mat4(gl, "uModel", model);
+        self.shader.set_mat4(gl, "uView", view);
+        self.shader.set_mat4(gl, "uProjection", proj);
+        self.shader.set_vec3(gl, "uColor", &color);
+        mesh.draw(gl);
+    }
+}

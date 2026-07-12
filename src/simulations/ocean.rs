@@ -10,7 +10,7 @@ struct Wave {
 pub struct Ocean {
     time: f32,
     // npoints: usize,
-    instance_id: usize,
+    instance_id: usize, //Solo un oceano
     waves: Vec<Wave>,
 }
 
@@ -28,6 +28,18 @@ impl Ocean {
                 frequency: 0.12f32,
                 direction: 0.4f32,
                 phase: 1.3f32,
+            },
+            Wave {
+                amplitude: 0.18f32,
+                frequency: 0.18f32,
+                direction: -0.3f32,
+                phase: 2.7f32,
+            },
+            Wave {
+                amplitude: 0.09f32,
+                frequency: 0.28f32,
+                direction: 0.7f32,
+                phase: 0.5f32,
             },
         ];
 

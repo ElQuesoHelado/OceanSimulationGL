@@ -41,9 +41,8 @@ void main() {
         dHdx += dTheta * dirCos;
         dHdz += dTheta * dirSin;
     }
-    pos.y = height;
-
-    Normal = vec3(-dHdx, 1.0, -dHdz);
+    pos.y = height * 8;
+    Normal = normalize(vec3(-dHdx, 1.0, -dHdz));
 
     FragPos = pos;
     TexCoord = aTexCoord;

@@ -29,7 +29,9 @@ void main() {
         float dirSin = sin(waves[i].direction);
         float theta = k * (pos.x * dirCos + pos.z * dirSin) - 2.0 * 3.14159265 * waves[i].frequency * time + waves[i].phase;
 
-        height = waves[i].amplitude * cos(theta); 
+        float c = cos(theta);
+        float s = sin(theta);
+        height += waves[i].amplitude * c;
     }
     pos.y = height;
 

@@ -18,9 +18,13 @@ uniform mat4 uView;
 
 out vec3 FragPos;
 out vec2 TexCoord;
+out vec3 Normal;
 
 void main() {
     vec3 pos = aPos;
+
+    float dHdx = 0.0;
+    float dHdz = 0.0;
 
     float height = 0.0;
     for(int i = 0; i < waveCount; i++) {
@@ -32,8 +36,14 @@ void main() {
         float c = cos(theta);
         float s = sin(theta);
         height += waves[i].amplitude * c;
+
+        float dTheta = -waves[i].amplitude * s * k;
+        dHdx += dTheta * dirCos;
+        dHdz += dTheta * dirSin;
     }
     pos.y = height;
+
+    Normal = vec3(-dHdx, 1.0, -dHdz);
 
     FragPos = pos;
     TexCoord = aTexCoord;

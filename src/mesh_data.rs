@@ -254,3 +254,61 @@ pub fn billboard() -> MeshData {
         aabb: AABB::new(positions),
     }
 }
+
+pub fn plane(n_points: usize) -> MeshData {
+    let mut positions: Vec<[f32; 3]> = Vec::with_capacity(n_points * n_points);
+    let mut normals: Vec<[f32; 3]> = Vec::with_capacity(n_points * n_points);
+    for i in 0..n_points {
+        for j in 0..n_points {
+            positions.push([
+                i as f32 / n_points as f32 * 20.0,
+                0.0,
+                j as f32 / n_points as f32 * 20.0,
+            ]);
+            normals.push([0.0, 1.0, 0.0]);
+        }
+    }
+
+    let positions: &'static [[f32; 3]] = positions.leak();
+    let normals: &'static [[f32; 3]] = normals.leak();
+
+    let mut indices: Vec<u32> = Vec::with_capacity((n_points - 1) * (n_points - 1) * 6);
+    for i in 0..n_points - 1 {
+        for j in 0..n_points - 1 {
+            let v0 = i * n_points + j;
+            let v1 = v0 + 1;
+            let v2 = (i + 1) * n_points + j;
+            let v3 = v2 + 1;
+
+            indices.push(v0 as u32);
+            indices.push(v2 as u32);
+            indices.push(v1 as u32);
+
+            indices.push(v1 as u32);
+            indices.push(v2 as u32);
+            indices.push(v3 as u32);
+        }
+    }
+
+    let indices: &'static [u32] = indices.leak();
+
+    let mut texcoords: Vec<[f32; 2]> = Vec::with_capacity(n_points * n_points);
+    for i in 0..n_points {
+        for j in 0..n_points {
+            texcoords.push([
+                i as f32 / (n_points - 1) as f32,
+                j as f32 / (n_points - 1) as f32,
+            ]);
+        }
+    }
+
+    let texcoords: &'static [[f32; 2]] = texcoords.leak();
+
+    MeshData {
+        positions,
+        normals,
+        texcoords,
+        indices,
+        aabb: AABB::new(positions),
+    }
+}

@@ -40,7 +40,7 @@ void main()
     vec3 diffuse = diffuseStrength * diff * lightColor;
 
     // Especular (Blinn-Phong)
-    vec3 viewDir = normalize(viewPos - FragPos)
+    vec3 viewDir = normalize(viewPos - FragPos);
 
     vec3 halfwayDir = normalize(lightDir + viewDir);
 

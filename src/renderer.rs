@@ -186,4 +186,46 @@ impl OceanRenderer {
 
         Ok(Self { shader, time: 0f32 })
     }
+
+    pub fn draw(
+        &self,
+        ctx: &GraphicsContext,
+        instances: &[Instance],
+        camera: &Camera,
+        light: &Light,
+    ) {
+        let gl = ctx.gl();
+
+        self.shader.activate(gl);
+        self.shader.set_mat4(gl, "uView", &camera.view());
+        self.shader
+            .set_mat4(gl, "uProjection", &camera.projection());
+        self.shader.set_bool(gl, "uLightingEnabled", light.enabled);
+        self.shader.set_vec3(gl, "uLightPos", &light.pos);
+        self.shader.set_vec3(gl, "uLightColor", &light.color);
+        self.shader.set_vec3(gl, "uEye", &camera.eye());
+        self.shader.set_float(gl, "time", self.time);
+
+        for inst in instances {
+            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_vec4(gl, "uColor", &inst.material.color);
+            self.shader
+                .set_float(gl, "uShininess", inst.material.shininess);
+
+            unsafe {
+                gl.active_texture(glow::TEXTURE0);
+                gl.bind_texture(
+                    glow::TEXTURE_2D,
+                    ctx.texture_library
+                        .get_texture_from_id(inst.material.texture_id)
+                        .map(|tex| tex.id),
+                );
+            }
+
+            match ctx.mesh_library.get(inst.mesh_id) {
+                Some(v) => v.draw(gl),
+                None => continue,
+            };
+        }
+    }
 }

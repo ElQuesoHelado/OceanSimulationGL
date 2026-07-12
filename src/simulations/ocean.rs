@@ -15,7 +15,13 @@ pub struct Ocean {
 }
 
 impl Ocean {
-    // pub fn new() -> Self {
-    //     Self {}
-    // }
+    pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
+        let waves: Vec<Wave> = vec![];
+
+        Self {
+            time: 0f32,
+            instance_id: 0,
+            waves,
+        }
+    }
 }

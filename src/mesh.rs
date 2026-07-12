@@ -53,3 +53,23 @@ impl AABB {
         }
     }
 }
+
+// Datos crudos de un mesh (Cubo, Esfera, ...)
+pub struct MeshData {
+    pub positions: &'static [[f32; 3]],
+    pub normals: &'static [[f32; 3]],
+    pub texcoords: &'static [[f32; 2]],
+    pub indices: &'static [u32],
+    pub aabb: AABB,
+}
+
+// Mesh ya cargado en la GPU
+pub struct Mesh {
+    vao: glow::VertexArray,
+    vbo_positions: glow::Buffer,
+    vbo_normals: glow::Buffer,
+    vbo_texcoords: glow::Buffer,
+    ebo: glow::Buffer,
+    index_count: i32,
+    pub data: MeshData,
+}

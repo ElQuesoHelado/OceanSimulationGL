@@ -116,10 +116,7 @@ impl App {
 
         let mut scene = Scene::new();
 
-        // let material = Material::new(&texture_library, vec4(1., 1., 1., 1.), 32., "hinojosa")
-        //     .expect("Textura no encontrada"); //TODO: en UI no hacer panic?
-
-        //scene.add_normal_instance(Instance::new(MeshId::Cube, material));
+        let simulation = Simulation::new(&mut scene, &texture_library);
 
         let size = window.inner_size();
         let camera = Camera::new(size.width as f32 / size.height as f32);
@@ -130,9 +127,6 @@ impl App {
             pos: vec3(0f32, 0f32, 0f32),
             color: vec3(1f32, 1f32, 1f32),
         };
-
-        // let rain = Rain::new(&mut scene, &texture_library, 2000);
-        let rain = Rain::new(&mut scene, &texture_library, 10);
 
         // Init Imgui
         let mut imgui_ctx = dear_imgui_rs::Context::create();
@@ -163,7 +157,7 @@ impl App {
             camera,
             floor_gizmo,
             light,
-            rain,
+            simulation,
             ui_ctx: UiContext {
                 imgui_ctx,
                 platform,

@@ -31,9 +31,9 @@ use crate::input_state::InputState;
 use crate::light::Light;
 use crate::material::Material;
 use crate::mesh::{self, MeshId, MeshLibrary};
-use crate::rain::Rain;
 use crate::renderer::{BillboardRenderer, SimpleColorRenderer, StandardRenderer};
 use crate::scene::{Instance, Scene};
+use crate::simulations::Simulation;
 use crate::texture::TextureLibrary;
 
 pub fn run() -> Result<(), Box<dyn Error>> {
@@ -126,7 +126,7 @@ struct AppState {
     camera: Camera,
     floor_gizmo: FloorGizmo,
     light: Light,
-    rain: Rain,
+    simulation: Simulation,
     ui_ctx: UiContext,
     ui_state: UiState,
 }

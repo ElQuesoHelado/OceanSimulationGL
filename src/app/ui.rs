@@ -153,23 +153,18 @@ pub fn build_ui(
             if ui.button("DUPE")
                 && let Some(idx) = ui_state.selected_instance
             {
-                std::mem::swap(
-                    &mut scene.normal_instances[idx].material.color,
-                    &mut ui_state.buffered_color,
-                );
-                let dup = scene.normal_instances[idx].clone();
-                scene.normal_instances.push(dup);
-                ui_state.selected_instance = None;
+                ui_state.clear_selected_instance(scene);
+
+                scene
+                    .normal_instances
+                    .push(scene.normal_instances[idx].clone());
             }
             if ui.button("DEL")
                 && let Some(idx) = ui_state.selected_instance
             {
-                std::mem::swap(
-                    &mut scene.normal_instances[idx].material.color,
-                    &mut ui_state.buffered_color,
-                );
-                scene.normal_instances.remove(idx);
-                ui_state.selected_instance = None;
+                ui_state.clear_selected_instance(scene);
+
+                scene.normal_instances.swap_remove(idx);
             }
 
             ui.separator();

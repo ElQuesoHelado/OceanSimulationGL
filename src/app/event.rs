@@ -59,19 +59,26 @@ impl App {
                     let shift = state.input.key_pressed(KeyCode::ShiftLeft);
                     if !alt && !shift {
                         match state.ui_state.click_mode {
-                            ClickMode::Insert => state.insert_current_mesh(
+                            ClickMode::Insert => state.ui_state.insert_current_mesh(
                                 state.input.mouse_x as f32,
                                 state.input.mouse_y as f32,
+                                &mut state.scene,
+                                &state.window,
+                                &state.camera,
                             ),
                             ClickMode::Select => {
-                                let Some(inst_idx) = state.select_instance(
+                                let Some(inst_idx) = state.ui_state.select_instance(
                                     state.input.mouse_x as f32,
                                     state.input.mouse_y as f32,
+                                    &state.scene,
+                                    &state.window,
+                                    &state.camera,
+                                    &state.graph_ctx.mesh_library,
                                 ) else {
                                     return;
                                 };
 
-                                state.clear_selected_instance();
+                                state.ui_state.clear_selected_instance(&mut state.scene);
                                 state.ui_state.selected_instance = Some(inst_idx);
 
                                 std::mem::swap(
@@ -98,12 +105,8 @@ impl App {
                     }
 
                     if code == KeyCode::Backquote {
-                        state.clear_selected_instance();
+                        state.ui_state.clear_selected_instance(&mut state.scene);
                     }
-
-                    // if event.state == ElementState::Pressed && !event.repeat {
-                    //     // state.handle_selection_key(code);
-                    // }
                 }
             }
             WindowEvent::MouseWheel { delta, .. } => {

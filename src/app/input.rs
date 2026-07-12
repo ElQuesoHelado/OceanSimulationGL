@@ -148,54 +148,61 @@ pub fn select_mesh(
         .map(|(idx, _)| idx)
 }
 
-impl AppState {
-    pub fn insert_current_mesh(&mut self, mouse_x: f32, mouse_y: f32) {
-        let mut instance =
-            Instance::new(self.ui_state.mesh_to_draw, self.ui_state.selected_material);
+impl UiState {
+    pub fn insert_current_mesh(
+        &mut self,
+        mouse_x: f32,
+        mouse_y: f32,
+        scene: &mut Scene,
+        window: &Window,
+        camera: &Camera,
+    ) {
+        let mut instance = Instance::new(self.mesh_to_draw, self.selected_material);
 
         instance.transform.translate(closest_hit_planes(
             mouse_x,
             mouse_y,
-            self.window.inner_size().width as f32,
-            self.window.inner_size().height as f32,
-            self.camera.eye(),
-            self.camera.view(),
-            self.camera.projection(),
+            window.inner_size().width as f32,
+            window.inner_size().height as f32,
+            camera.eye(),
+            camera.view(),
+            camera.projection(),
         ));
 
-        match self.ui_state.mesh_to_draw {
-            MeshId::Billboard => self.scene.billboard_instances.push(instance),
-            _ => self.scene.normal_instances.push(instance),
+        match self.mesh_to_draw {
+            MeshId::Billboard => scene.billboard_instances.push(instance),
+            _ => scene.normal_instances.push(instance),
         }
     }
 
-    pub fn select_instance(&self, mouse_x: f32, mouse_y: f32) -> Option<usize> {
+    pub fn select_instance(
+        &self,
+        mouse_x: f32,
+        mouse_y: f32,
+        scene: &Scene,
+        window: &Window,
+        camera: &Camera,
+        mesh_library: &MeshLibrary,
+    ) -> Option<usize> {
         let (ray_origin, ray_dir) = get_ray(
             mouse_x,
             mouse_y,
-            self.window.inner_size().width as f32,
-            self.window.inner_size().height as f32,
-            self.camera.view(),
-            self.camera.projection(),
+            window.inner_size().width as f32,
+            window.inner_size().height as f32,
+            camera.view(),
+            camera.projection(),
         );
-        select_mesh(
-            ray_origin,
-            ray_dir,
-            &self.scene.normal_instances,
-            &self.graph_ctx.mesh_library,
-        )
+        select_mesh(ray_origin, ray_dir, &scene.normal_instances, &mesh_library)
     }
 
-    pub fn clear_selected_instance(&mut self) {
-        if let Some(prev_selected_idx) = self.ui_state.selected_instance {
+    pub fn clear_selected_instance(&mut self, scene: &mut Scene) {
+        if let Some(prev_selected_idx) = self.selected_instance {
             std::mem::swap(
-                &mut self.scene.normal_instances[prev_selected_idx]
-                    .material
-                    .color,
-                &mut self.ui_state.buffered_color,
+                &mut scene.normal_instances[prev_selected_idx].material.color,
+                &mut self.buffered_color,
             );
 
-            self.ui_state.selected_instance = None;
+            self.selected_instance = None;
         };
     }
 }

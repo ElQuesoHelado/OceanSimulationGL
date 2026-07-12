@@ -22,3 +22,34 @@ pub enum MeshId {
 pub struct MeshLibrary {
     meshes: Vec<Mesh>,
 }
+
+pub struct AABB {
+    pub min_point: glam::Vec3,
+    pub max_point: glam::Vec3,
+}
+
+impl AABB {
+    pub fn new(positions: &[[f32; 3]]) -> Self {
+        let Some(first) = positions.first() else {
+            return Self {
+                min_point: vec3(0.0, 0.0, 0.0),
+                max_point: vec3(0.0, 0.0, 0.0),
+            };
+        };
+
+        let first = Vec3::from_slice(first);
+
+        let (min_point, max_point) =
+            positions
+                .iter()
+                .fold((first, first), |(min, max), &[x, y, z]| {
+                    let p = vec3(x, y, z);
+                    (min.min(p), max.max(p))
+                });
+
+        Self {
+            min_point,
+            max_point,
+        }
+    }
+}

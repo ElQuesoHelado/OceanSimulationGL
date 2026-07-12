@@ -65,7 +65,7 @@ fn get_ray(
         viewport,
     );
     let far = un_project(
-        Vec3::new(mouse_x, height - mouse_y, 1000.0),
+        Vec3::new(mouse_x, height - mouse_y, 1.0),
         view,
         proj,
         viewport,
@@ -99,15 +99,16 @@ fn ray_to_local(origin: Vec3, dir: Vec3, model: Mat4) -> (Vec3, Vec3) {
     (local_origin, local_dir.normalize())
 }
 
-pub fn select_mesh<'a>(
+pub fn select_mesh(
     ray_origin: Vec3,
     ray_dir: Vec3,
-    instances: &'a [Instance],
+    instances: &[Instance],
     mesh_library: &MeshLibrary,
-) -> Option<&'a Instance> {
+) -> Option<usize> {
     instances
         .iter()
-        .filter(|m| {
+        .enumerate()
+        .filter(|(_, m)| {
             let (lo, ld) = ray_to_local(ray_origin, ray_dir, m.transform.mat);
 
             let Some(mesh) = mesh_library.get(m.mesh_id) else {
@@ -116,7 +117,7 @@ pub fn select_mesh<'a>(
 
             ray_hits_aabb(lo, ld, mesh.data.aabb.min_point, mesh.data.aabb.max_point)
         })
-        .min_by(|a, b| {
+        .min_by(|(_, a), (_, b)| {
             let mesh_a = mesh_library.get(a.mesh_id).unwrap();
             let mesh_b = mesh_library.get(b.mesh_id).unwrap();
 
@@ -144,6 +145,7 @@ pub fn select_mesh<'a>(
 
             dist_a.total_cmp(&dist_b)
         })
+        .map(|(idx, _)| idx)
 }
 
 impl AppState {
@@ -167,20 +169,33 @@ impl AppState {
         }
     }
 
-    pub fn select_instance(&self, mouse_x: f32, mouse_y: f32) -> Option<&Instance> {
+    pub fn select_instance(&self, mouse_x: f32, mouse_y: f32) -> Option<usize> {
+        let (ray_origin, ray_dir) = get_ray(
+            mouse_x,
+            mouse_y,
+            self.window.inner_size().width as f32,
+            self.window.inner_size().height as f32,
+            self.camera.view(),
+            self.camera.projection(),
+        );
         select_mesh(
-            self.camera.eye(),
-            get_ray(
-                mouse_x,
-                mouse_y,
-                self.window.inner_size().width as f32,
-                self.window.inner_size().width as f32,
-                self.camera.view(),
-                self.camera.projection(),
-            )
-            .1,
+            ray_origin,
+            ray_dir,
             &self.scene.normal_instances,
             &self.graph_ctx.mesh_library,
         )
+    }
+
+    pub fn clear_selected_instance(&mut self) {
+        if let Some(prev_selected_idx) = self.ui_state.selected_instance {
+            std::mem::swap(
+                &mut self.scene.normal_instances[prev_selected_idx]
+                    .material
+                    .color,
+                &mut self.ui_state.buffered_color,
+            );
+
+            self.ui_state.selected_instance = None;
+        };
     }
 }

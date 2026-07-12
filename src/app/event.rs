@@ -64,16 +64,20 @@ impl App {
                                 state.input.mouse_y as f32,
                             ),
                             ClickMode::Select => {
-                                let Some(instance) = state.select_instance(
+                                let Some(inst_idx) = state.select_instance(
                                     state.input.mouse_x as f32,
                                     state.input.mouse_y as f32,
                                 ) else {
                                     return;
                                 };
 
-                                // if (state.ui_state.selected_mesh == ) {}
+                                state.clear_selected_instance();
+                                state.ui_state.selected_instance = Some(inst_idx);
 
-                                let x = 5;
+                                std::mem::swap(
+                                    &mut state.scene.normal_instances[inst_idx].material.color,
+                                    &mut state.ui_state.buffered_color,
+                                );
                             }
                         }
                     }
@@ -93,9 +97,13 @@ impl App {
                         event_loop.exit();
                     }
 
-                    if event.state == ElementState::Pressed && !event.repeat {
-                        // state.handle_selection_key(code);
+                    if code == KeyCode::Backquote {
+                        state.clear_selected_instance();
                     }
+
+                    // if event.state == ElementState::Pressed && !event.repeat {
+                    //     // state.handle_selection_key(code);
+                    // }
                 }
             }
             WindowEvent::MouseWheel { delta, .. } => {

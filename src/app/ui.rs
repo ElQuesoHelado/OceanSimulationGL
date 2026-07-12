@@ -31,8 +31,16 @@ pub fn build_ui(
         .size([toolbar_width, height], Condition::Always)
         .flags(WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE | WindowFlags::NO_COLLAPSE)
         .build(|| {
-            ui.text("Figuras");
+            ui.text("Click Mode");
+            if ui.radio_button_bool("Insertar", ui_state.click_mode == ClickMode::Insert) {
+                ui_state.click_mode = ClickMode::Insert;
+            }
+            if ui.radio_button_bool("Seleccionar", ui_state.click_mode == ClickMode::Select) {
+                ui_state.click_mode = ClickMode::Select;
+            }
             ui.separator();
+
+            ui.text("Figuras");
 
             for (label, mesh_id) in MESH_OPTIONS {
                 let is_selected = ui_state.mesh_to_draw == *mesh_id;
@@ -107,30 +115,30 @@ pub fn build_ui(
             // --- Traslaciones ---
             match stepper(ui, "TRANSX", "l5") {
                 Step::Plus => with_selected(ui_state, scene, |p| {
-                    p.transform.translate(vec3(1.0, 0.0, 0.0));
+                    p.transform.translate(vec3(0.5, 0.0, 0.0));
                 }),
                 Step::Minus => with_selected(ui_state, scene, |p| {
-                    p.transform.translate(vec3(-1.0, 0.0, 0.0));
+                    p.transform.translate(vec3(-0.5, 0.0, 0.0));
                 }),
                 Step::None => {}
             }
 
             match stepper(ui, "TRANSY", "l6") {
                 Step::Plus => with_selected(ui_state, scene, |p| {
-                    p.transform.translate(vec3(0.0, 1.0, 0.0));
+                    p.transform.translate(vec3(0.0, 0.5, 0.0));
                 }),
                 Step::Minus => with_selected(ui_state, scene, |p| {
-                    p.transform.translate(vec3(0.0, -1.0, 0.0));
+                    p.transform.translate(vec3(0.0, -0.5, 0.0));
                 }),
                 Step::None => {}
             }
 
             match stepper(ui, "TRANSZ", "l7") {
                 Step::Plus => with_selected(ui_state, scene, |p| {
-                    p.transform.translate(vec3(0.0, 0.0, 1.0));
+                    p.transform.translate(vec3(0.0, 0.0, 0.5));
                 }),
                 Step::Minus => with_selected(ui_state, scene, |p| {
-                    p.transform.translate(vec3(0.0, 0.0, -1.0));
+                    p.transform.translate(vec3(0.0, 0.0, -0.5));
                 }),
                 Step::None => {}
             }

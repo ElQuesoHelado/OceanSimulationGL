@@ -73,6 +73,7 @@ impl GraphicsContext {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum ClickMode {
     Insert,
     Select,
@@ -103,7 +104,7 @@ impl UiState {
                 shininess: 200f32,
                 texture_id: default_texture_id,
             },
-            buffered_color: vec4(1f32, 1f32, 1f32, 1f32),
+            buffered_color: vec4(1f32, 0f32, 0f32, 0.6f32),
             wireframe_enabled: false,
             lighting_enabled: false,
             click_mode: ClickMode::Insert,

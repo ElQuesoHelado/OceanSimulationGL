@@ -172,3 +172,18 @@ impl SimpleColorRenderer {
         mesh.draw(gl);
     }
 }
+
+pub struct OceanRenderer {
+    shader: Shader,
+    time: f32,
+}
+
+impl OceanRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        let shader = Shader::new(gl, vertex_path, frag_path)?;
+        shader.activate(gl);
+        shader.set_int(gl, "uTexture", 0);
+
+        Ok(Self { shader, time: 0f32 })
+    }
+}

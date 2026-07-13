@@ -30,7 +30,7 @@ use crate::gizmo::FloorGizmo;
 use crate::input_state::InputState;
 use crate::light::Light;
 use crate::material::Material;
-use crate::mesh::{self, MeshId, MeshLibrary};
+use crate::mesh::{MeshId, MeshLibrary};
 use crate::renderer::{BillboardRenderer, OceanRenderer, SimpleColorRenderer, StandardRenderer};
 use crate::scene::{Instance, Scene};
 use crate::simulations::Simulation;

@@ -212,7 +212,7 @@ impl OceanRenderer {
         };
 
         let instance = Instance::new(crate::mesh::MeshId::Plane, material);
-        let instance_id = scene.add_normal_instance(instance);
+        let instance_id = scene.add_ocean_instance(instance);
 
         Ok(Self {
             shader,
@@ -222,7 +222,7 @@ impl OceanRenderer {
     }
 
     pub fn draw(
-        &self,
+        &mut self,
         ctx: &GraphicsContext,
         instances: &[Instance],
         camera: &Camera,
@@ -261,6 +261,8 @@ impl OceanRenderer {
         if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
             v.draw(gl);
         };
+
+        self.time += 0.1;
         // }
     }
 }

@@ -22,6 +22,7 @@ impl Instance {
 pub struct Scene {
     pub normal_instances: Vec<Instance>,
     pub billboard_instances: Vec<Instance>,
+    pub ocean_instances: Vec<Instance>,
 }
 
 impl Scene {
@@ -29,12 +30,18 @@ impl Scene {
         Self {
             normal_instances: Vec::new(),
             billboard_instances: Vec::new(),
+            ocean_instances: Vec::new(),
         }
     }
 
     pub fn add_normal_instance(&mut self, instance: Instance) -> usize {
         self.normal_instances.push(instance);
         self.normal_instances.len() - 1
+    }
+
+    pub fn add_ocean_instance(&mut self, instance: Instance) -> usize {
+        self.ocean_instances.push(instance);
+        self.ocean_instances.len() - 1
     }
 
     pub fn add_billboard_instance(&mut self, instance: Instance) -> usize {

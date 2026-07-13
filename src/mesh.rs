@@ -36,7 +36,7 @@ impl MeshLibrary {
             Mesh::upload(gl, mesh_data::tetrahedron()),
             Mesh::upload(gl, mesh_data::torus()),
             Mesh::upload(gl, mesh_data::billboard()),
-            Mesh::upload(gl, mesh_data::plane(2000)),
+            Mesh::upload(gl, mesh_data::plane(500)),
         ];
 
         Self { meshes }
@@ -241,4 +241,3 @@ impl SimpleMesh {
         }
     }
 }
-

@@ -52,4 +52,29 @@ impl Transform {
         self.mat.w_axis.z = position.z;
         self
     }
+
+    pub fn set_pos_x(&mut self, coord: f32) -> &Self {
+        self.mat.w_axis.x = coord;
+        self
+    }
+    pub fn set_pos_y(&mut self, coord: f32) -> &Self {
+        self.mat.w_axis.y = coord;
+        self
+    }
+    pub fn set_pos_z(&mut self, coord: f32) -> &Self {
+        self.mat.w_axis.z = coord;
+        self
+    }
+
+    pub fn get_x(&self) -> f32 {
+        self.mat.w_axis.x
+    }
+
+    pub fn get_y(&self) -> f32 {
+        self.mat.w_axis.y
+    }
+
+    pub fn get_z(&self) -> f32 {
+        self.mat.w_axis.z
+    }
 }

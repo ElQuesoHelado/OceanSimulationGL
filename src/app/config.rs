@@ -106,7 +106,7 @@ impl App {
 
         let light = Light {
             enabled: true,
-            pos: vec3(50f32, 0f32, 50f32),
+            pos: vec3(100f32, 15f32, 100f32),
             color: vec3(1f32, 1f32, 1f32),
         };
 
@@ -192,6 +192,7 @@ impl App {
                 platform,
             },
             ui_state: UiState::new(blank_tex_id),
+            time: 0.0,
         });
     }
 }

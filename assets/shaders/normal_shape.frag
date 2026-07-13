@@ -50,7 +50,7 @@ void main()
     );
 
     vec3 specular =
-        2 * spec * uLightColor;
+        1 * spec * uLightColor;
 
     result =
         (ambient + diffuse) * baseColor +

@@ -130,6 +130,7 @@ struct AppState {
     simulation: Simulation,
     ui_ctx: UiContext,
     ui_state: UiState,
+    time: f32,
 }
 
 struct App {

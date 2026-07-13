@@ -17,7 +17,13 @@ impl App {
             }
         }
 
+        // Simulations
+
         // state.rain.update(&mut state.scene, 0.11f32);
+        state
+            .simulation
+            .ocean
+            .update(&mut state.scene.normal_instances, state.time);
 
         // state.process_input();
         // state.input.end_frame();
@@ -41,6 +47,7 @@ impl App {
             &state.scene.ocean_instances,
             &state.camera,
             &state.light,
+            state.time,
         );
 
         // let identity = glam::Mat4::IDENTITY;
@@ -95,5 +102,7 @@ impl App {
 
         state.window.request_redraw();
         state.gl_surface.swap_buffers(&state.gl_context).unwrap();
+
+        state.time += 0.02;
     }
 }

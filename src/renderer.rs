@@ -178,7 +178,6 @@ impl SimpleColorRenderer {
 
 pub struct OceanRenderer {
     shader: Shader,
-    time: f32,
     instance_id: usize,
 }
 
@@ -215,7 +214,6 @@ impl OceanRenderer {
 
         Ok(Self {
             shader,
-            time: 0f32,
             instance_id,
         })
     }
@@ -226,6 +224,7 @@ impl OceanRenderer {
         instances: &[Instance],
         camera: &Camera,
         light: &Light,
+        time: f32,
     ) {
         let gl = ctx.gl();
 
@@ -237,7 +236,7 @@ impl OceanRenderer {
         self.shader.set_vec3(gl, "uLightPos", &light.pos);
         self.shader.set_vec3(gl, "uLightColor", &light.color);
         self.shader.set_vec3(gl, "uEye", &camera.eye());
-        self.shader.set_float(gl, "time", self.time);
+        self.shader.set_float(gl, "time", time);
 
         for inst in instances {
             // let inst = &instances[self.instance_id];
@@ -260,8 +259,6 @@ impl OceanRenderer {
             if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
                 v.draw(gl);
             };
-
-            self.time += 0.1;
         }
     }
 }

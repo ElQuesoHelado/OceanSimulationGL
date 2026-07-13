@@ -30,7 +30,7 @@ impl FloorGizmo {
         Self {
             gizmo: SimpleMesh::upload(gl, &giz_pts, glow::LINES),
             floor: SimpleMesh::upload(gl, &floor_vertices, glow::TRIANGLES),
-            gizmo_color: glam::Vec3::new(0.0, 1.0, 1.0),
+            gizmo_color: glam::Vec3::new(0.0, 1.0, 0.0),
             floor_color: glam::Vec3::new(0.5, 0.5, 0.5),
         }
     }

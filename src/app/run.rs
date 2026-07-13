@@ -25,7 +25,7 @@ impl App {
         state.graph_ctx.clear();
         state.standard_renderer.draw(
             &state.graph_ctx,
-            &state.scene.normal_instances,
+            &state.scene.ocean_instances,
             &state.camera,
             &state.light,
         );
@@ -43,24 +43,24 @@ impl App {
             &state.light,
         );
 
-        let identity = glam::Mat4::IDENTITY;
-        state.floor_giz_renderer.draw(
-            state.graph_ctx.gl(),
-            &state.floor_gizmo.floor,
-            &identity,
-            &state.camera.view(),
-            &state.camera.projection(),
-            state.floor_gizmo.floor_color,
-        );
-
-        state.floor_giz_renderer.draw(
-            state.graph_ctx.gl(),
-            &state.floor_gizmo.gizmo,
-            &identity,
-            &state.camera.view(),
-            &state.camera.projection(),
-            state.floor_gizmo.gizmo_color,
-        );
+        // let identity = glam::Mat4::IDENTITY;
+        // state.floor_giz_renderer.draw(
+        //     state.graph_ctx.gl(),
+        //     &state.floor_gizmo.floor,
+        //     &identity,
+        //     &state.camera.view(),
+        //     &state.camera.projection(),
+        //     state.floor_gizmo.floor_color,
+        // );
+        //
+        // state.floor_giz_renderer.draw(
+        //     state.graph_ctx.gl(),
+        //     &state.floor_gizmo.gizmo,
+        //     &identity,
+        //     &state.camera.view(),
+        //     &state.camera.projection(),
+        //     state.floor_gizmo.gizmo_color,
+        // );
 
         //Render ImGui
         unsafe {

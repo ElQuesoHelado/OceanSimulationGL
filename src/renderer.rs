@@ -10,6 +10,7 @@ use crate::{
     scene::{self, Instance, Scene},
     shader::Shader,
     simulations::{Simulation, ocean::Wave},
+    texture::TextureLibrary,
 };
 
 // Figuras 3D
@@ -188,6 +189,7 @@ impl OceanRenderer {
         frag_path: &str,
         waves: &[Wave],
         scene: &mut Scene,
+        texture_library: &TextureLibrary,
     ) -> Result<Self, String> {
         let shader = Shader::new(gl, vertex_path, frag_path)?;
         shader.activate(gl);
@@ -205,11 +207,8 @@ impl OceanRenderer {
 
         shader.set_int(gl, "waveCount", waves.len() as i32);
 
-        let material = Material {
-            color: vec4(1f32, 1f32, 1f32, 1f32),
-            shininess: 200f32,
-            texture_id: 0,
-        };
+        let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 256., "castelo")
+            .expect("Textura no encontrada");
 
         let instance = Instance::new(crate::mesh::MeshId::Plane, material);
         let instance_id = scene.add_ocean_instance(instance);
@@ -240,30 +239,29 @@ impl OceanRenderer {
         self.shader.set_vec3(gl, "uEye", &camera.eye());
         self.shader.set_float(gl, "time", self.time);
 
-        // for inst in instances {
-        let inst = &instances[self.instance_id];
+        for inst in instances {
+            // let inst = &instances[self.instance_id];
 
-        self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
-        self.shader.set_vec4(gl, "uColor", &inst.material.color);
-        self.shader
-            .set_float(gl, "uShininess", inst.material.shininess);
+            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_vec4(gl, "uColor", &inst.material.color);
+            self.shader
+                .set_float(gl, "uShininess", inst.material.shininess);
 
-        unsafe {
-            gl.active_texture(glow::TEXTURE0);
-            gl.bind_texture(
-                glow::TEXTURE_2D,
-                ctx.texture_library
-                    .get_texture_from_id(inst.material.texture_id)
-                    .map(|tex| tex.id),
-            );
+            unsafe {
+                gl.active_texture(glow::TEXTURE0);
+                gl.bind_texture(
+                    glow::TEXTURE_2D,
+                    ctx.texture_library
+                        .get_texture_from_id(inst.material.texture_id)
+                        .map(|tex| tex.id),
+                );
+            }
+
+            if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
+                v.draw(gl);
+            };
+
+            self.time += 0.1;
         }
-
-        if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
-            v.draw(gl);
-        };
-
-        self.time += 0.1;
-        // }
     }
 }
-

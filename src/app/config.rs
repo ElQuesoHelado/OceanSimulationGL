@@ -123,17 +123,18 @@ impl App {
 
         let standard_renderer = StandardRenderer::new(
             &gl,
-            "assets/shaders/shader.vert",
-            "assets/shaders/shader.frag",
+            "assets/shaders/normal_shape.vert",
+            "assets/shaders/normal_shape.frag",
         )
         .expect("Creacion de Renderer Standard fallida");
 
         let ocean_renderer = OceanRenderer::new(
             &gl,
             "assets/shaders/ocean.vert",
-            "assets/shaders/ocean.frag",
+            "assets/shaders/normal_shape.frag",
             &simulation.ocean.waves,
             &mut scene,
+            &texture_library,
         )
         .expect("Creacion de Renderer Ocean fallida");
 

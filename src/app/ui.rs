@@ -13,6 +13,7 @@ const MESH_OPTIONS: &[(&str, MeshId)] = &[
     ("Tetraedro", MeshId::Tetrahedron),
     ("Cono", MeshId::Cone),
     ("Billboard", MeshId::Billboard),
+    ("Plane", MeshId::Plane),
 ];
 
 pub fn build_ui(

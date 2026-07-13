@@ -53,7 +53,7 @@ impl Camera {
     }
 
     pub fn zoom(&mut self, delta: f32) {
-        self.distance *= (1.0 - delta * 0.01);
+        self.distance *= (1.0 - delta * 0.1);
         self.distance = self.distance.max(0.1);
     }
 

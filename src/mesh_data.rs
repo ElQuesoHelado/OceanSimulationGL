@@ -261,9 +261,9 @@ pub fn plane(n_points: usize) -> MeshData {
     for i in 0..n_points {
         for j in 0..n_points {
             positions.push([
-                i as f32 / n_points as f32 * 20.0,
+                i as f32 / (n_points - 1) as f32,
                 0.0,
-                j as f32 / n_points as f32 * 20.0,
+                j as f32 / (n_points - 1) as f32,
             ]);
             normals.push([0.0, 1.0, 0.0]);
         }

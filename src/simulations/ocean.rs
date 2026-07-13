@@ -1,21 +1,22 @@
 use super::*;
 
-struct Wave {
-    amplitude: f32,
-    frequency: f32,
-    direction: f32,
-    phase: f32,
+pub struct Wave {
+    pub amplitude: f32,
+    pub frequency: f32,
+    pub direction: f32,
+    pub phase: f32,
 }
 
 pub struct Ocean {
-    time: f32,
+    pub time: f32,
     // npoints: usize,
-    instance_id: usize, //Solo un oceano
-    waves: Vec<Wave>,
+    pub instance_id: usize, //Solo un oceano
+    pub waves: Vec<Wave>,
 }
 
 impl Ocean {
-    pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
+    // pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
+    pub fn new() -> Self {
         let waves: Vec<Wave> = vec![
             Wave {
                 amplitude: 0.6f32,

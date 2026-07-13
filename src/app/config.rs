@@ -1,3 +1,5 @@
+use crate::simulations::ocean::Ocean;
+
 use super::*;
 
 impl App {
@@ -14,6 +16,10 @@ impl App {
         if self.state.is_some() {
             return;
         }
+
+        //*************************
+        // Winit ,GL
+        //*************************
 
         let window_attributes =
             Window::default_attributes().with_title("Editor 3D (Escape para salir)");
@@ -87,6 +93,33 @@ impl App {
         {
             eprintln!("No se pudo activar vsync: {err:?}");
         }
+        //*************************
+        // Mesh/Mesh Handling related
+        //*************************
+        let mesh_library = MeshLibrary::new(&gl);
+        let texture_library = TextureLibrary::new(&gl, "assets/textures");
+
+        let mut scene = Scene::new();
+
+        let size = window.inner_size();
+        let camera = Camera::new(size.width as f32 / size.height as f32);
+
+        let light = Light {
+            enabled: true,
+            //pos: vec3(1f32, 1f32, 1f32),
+            pos: vec3(0f32, 0f32, 0f32),
+            color: vec3(1f32, 1f32, 1f32),
+        };
+
+        //*************************
+        // Simulation
+        //*************************
+
+        let simulation = Simulation::new(&mut scene, &texture_library);
+
+        //*************************
+        // Renderers
+        //*************************
 
         let standard_renderer = StandardRenderer::new(
             &gl,
@@ -94,6 +127,15 @@ impl App {
             "assets/shaders/shader.frag",
         )
         .expect("Creacion de Renderer Standard fallida");
+
+        let ocean_renderer = OceanRenderer::new(
+            &gl,
+            "assets/shaders/ocean.vert",
+            "assets/shaders/ocean.frag",
+            &simulation.ocean.waves,
+            &mut scene,
+        )
+        .expect("Creacion de Renderer Ocean fallida");
 
         let billboard_renderer = BillboardRenderer::new(
             &gl,
@@ -111,24 +153,10 @@ impl App {
 
         let floor_gizmo = FloorGizmo::new(&gl);
 
-        let mesh_library = MeshLibrary::new(&gl);
-        let texture_library = TextureLibrary::new(&gl, "assets/textures");
-
-        let mut scene = Scene::new();
-
-        let simulation = Simulation::new(&mut scene, &texture_library);
-
-        let size = window.inner_size();
-        let camera = Camera::new(size.width as f32 / size.height as f32);
-
-        let light = Light {
-            enabled: true,
-            //pos: vec3(1f32, 1f32, 1f32),
-            pos: vec3(0f32, 0f32, 0f32),
-            color: vec3(1f32, 1f32, 1f32),
-        };
-
+        //*************************
         // Init Imgui
+        //*************************
+
         let mut imgui_ctx = dear_imgui_rs::Context::create();
         let mut platform = dear_imgui_winit::WinitPlatform::new(&mut imgui_ctx);
         platform.attach_window(&window, HiDpiMode::Default, &mut imgui_ctx);
@@ -145,6 +173,7 @@ impl App {
             gl_context,
             gl_surface,
             standard_renderer,
+            ocean_renderer,
             billboard_renderer,
             floor_giz_renderer,
             graph_ctx: GraphicsContext {

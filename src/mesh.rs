@@ -206,7 +206,6 @@ impl SimpleMesh {
             let vao = gl.create_vertex_array().unwrap();
             let vbo = gl.create_buffer().unwrap();
 
-            // Materializa los objetos (glow usa Gen* por debajo, no Create*)
             gl.bind_vertex_array(Some(vao));
             gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
             gl.bind_vertex_array(None);
@@ -242,3 +241,4 @@ impl SimpleMesh {
         }
     }
 }
+

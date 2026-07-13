@@ -36,6 +36,13 @@ impl App {
             &state.camera,
         );
 
+        state.standard_renderer.draw(
+            &state.graph_ctx,
+            &state.scene.normal_instances,
+            &state.camera,
+            &state.light,
+        );
+
         let identity = glam::Mat4::IDENTITY;
         state.floor_giz_renderer.draw(
             state.graph_ctx.gl(),

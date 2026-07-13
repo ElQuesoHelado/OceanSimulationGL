@@ -1,13 +1,15 @@
-use glam::{Mat4, Vec3, camera};
+use glam::{Mat4, Vec3, camera, vec4};
 use glow::HasContext;
 
 use crate::{
     app::GraphicsContext,
     camera::Camera,
     light::Light,
+    material::Material,
     mesh::{MeshLibrary, SimpleMesh},
-    scene::Instance,
+    scene::{self, Instance, Scene},
     shader::Shader,
+    simulations::{Simulation, ocean::Wave},
 };
 
 // Figuras 3D
@@ -176,15 +178,47 @@ impl SimpleColorRenderer {
 pub struct OceanRenderer {
     shader: Shader,
     time: f32,
+    instance_id: usize,
 }
 
 impl OceanRenderer {
-    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+    pub fn new(
+        gl: &glow::Context,
+        vertex_path: &str,
+        frag_path: &str,
+        waves: &[Wave],
+        scene: &mut Scene,
+    ) -> Result<Self, String> {
         let shader = Shader::new(gl, vertex_path, frag_path)?;
         shader.activate(gl);
         shader.set_int(gl, "uTexture", 0);
 
-        Ok(Self { shader, time: 0f32 })
+        for (i, wave) in waves.iter().enumerate() {
+            shader.set_float(gl, &format!("waves[{}].amplitude", i), wave.amplitude);
+
+            shader.set_float(gl, &format!("waves[{}].frequency", i), wave.frequency);
+
+            shader.set_float(gl, &format!("waves[{}].direction", i), wave.direction);
+
+            shader.set_float(gl, &format!("waves[{}].phase", i), wave.phase);
+        }
+
+        shader.set_int(gl, "waveCount", waves.len() as i32);
+
+        let material = Material {
+            color: vec4(1f32, 1f32, 1f32, 1f32),
+            shininess: 200f32,
+            texture_id: 0,
+        };
+
+        let instance = Instance::new(crate::mesh::MeshId::Plane, material);
+        let instance_id = scene.add_normal_instance(instance);
+
+        Ok(Self {
+            shader,
+            time: 0f32,
+            instance_id,
+        })
     }
 
     pub fn draw(
@@ -206,26 +240,28 @@ impl OceanRenderer {
         self.shader.set_vec3(gl, "uEye", &camera.eye());
         self.shader.set_float(gl, "time", self.time);
 
-        for inst in instances {
-            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
-            self.shader.set_vec4(gl, "uColor", &inst.material.color);
-            self.shader
-                .set_float(gl, "uShininess", inst.material.shininess);
+        // for inst in instances {
+        let inst = &instances[self.instance_id];
 
-            unsafe {
-                gl.active_texture(glow::TEXTURE0);
-                gl.bind_texture(
-                    glow::TEXTURE_2D,
-                    ctx.texture_library
-                        .get_texture_from_id(inst.material.texture_id)
-                        .map(|tex| tex.id),
-                );
-            }
+        self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+        self.shader.set_vec4(gl, "uColor", &inst.material.color);
+        self.shader
+            .set_float(gl, "uShininess", inst.material.shininess);
 
-            match ctx.mesh_library.get(inst.mesh_id) {
-                Some(v) => v.draw(gl),
-                None => continue,
-            };
+        unsafe {
+            gl.active_texture(glow::TEXTURE0);
+            gl.bind_texture(
+                glow::TEXTURE_2D,
+                ctx.texture_library
+                    .get_texture_from_id(inst.material.texture_id)
+                    .map(|tex| tex.id),
+            );
         }
+
+        if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
+            v.draw(gl);
+        };
+        // }
     }
 }
+

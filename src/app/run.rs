@@ -25,7 +25,7 @@ impl App {
         state.graph_ctx.clear();
         state.standard_renderer.draw(
             &state.graph_ctx,
-            &state.scene.ocean_instances,
+            &state.scene.normal_instances,
             &state.camera,
             &state.light,
         );

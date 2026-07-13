@@ -36,29 +36,8 @@ impl MeshLibrary {
             Mesh::upload(gl, mesh_data::tetrahedron()),
             Mesh::upload(gl, mesh_data::torus()),
             Mesh::upload(gl, mesh_data::billboard()),
-            Mesh::upload(gl, mesh_data::plane(500)),
+            Mesh::upload(gl, mesh_data::plane(400)),
         ];
-
-        println!(
-            "{:?} .. {:?} .. {:?}",
-            meshes[5].data.texcoords[0],
-            meshes[5].data.texcoords[meshes[5].data.texcoords.len() / 2],
-            meshes[5].data.texcoords[meshes[5].data.texcoords.len() - 1]
-        );
-
-        println!(
-            "{:?} .. {:?} .. {:?}",
-            meshes[9].data.texcoords[0],
-            meshes[9].data.texcoords[meshes[9].data.texcoords.len() / 2],
-            meshes[9].data.texcoords[meshes[9].data.texcoords.len() - 1]
-        );
-
-        println!(
-            "{:?} .. {:?} .. {:?}",
-            meshes[10].data.texcoords[0],
-            meshes[10].data.texcoords[meshes[10].data.texcoords.len() / 2],
-            meshes[10].data.texcoords[meshes[10].data.texcoords.len() - 1]
-        );
 
         Self { meshes }
     }

@@ -60,7 +60,7 @@ void main()
   }
 
 
-  // FragColor = vec4(result, texColor.a * uColor.a);
-  FragColor = vec4(TexCoord, 0.0, 1.0);
+  FragColor = vec4(result, texColor.a * uColor.a);
+  // FragColor = vec4(TexCoord, 0.0, 1.0);
   // FragColor = vec4(1,1,1,1);
 }

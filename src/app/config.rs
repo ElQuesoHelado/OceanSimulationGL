@@ -106,8 +106,7 @@ impl App {
 
         let light = Light {
             enabled: true,
-            //pos: vec3(1f32, 1f32, 1f32),
-            pos: vec3(0f32, 0f32, 0f32),
+            pos: vec3(50f32, 0f32, 50f32),
             color: vec3(1f32, 1f32, 1f32),
         };
 

@@ -5,6 +5,7 @@ use crate::meshes::{mesh::AABB, mesh_data::MeshData};
 // Carga de meshes complejos/custom en formatos estandarizados
 // Se "aplana" todos los submeshes para respetar estructura MeshData
 // Algunos meshes NO tienen tanto texcoords ni vectores normales
+// Se genera una provicional
 pub fn load_mesh(path: &str) -> Result<MeshData, Error> {
     // pub fn load_mesh(path: &str) {
     let (document, buffers, _) = gltf::import(path)?;

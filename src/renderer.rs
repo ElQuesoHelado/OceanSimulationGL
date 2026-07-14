@@ -45,7 +45,7 @@ impl StandardRenderer {
         self.shader.set_vec3(gl, "uEye", &camera.eye());
 
         for inst in instances {
-            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_mat4(gl, "uModel", &inst.transform.matrix());
             self.shader.set_vec4(gl, "uColor", &inst.material.color);
             self.shader
                 .set_float(gl, "uShininess", inst.material.shininess);
@@ -121,7 +121,7 @@ impl BillboardRenderer {
         }
 
         for inst in instances {
-            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_mat4(gl, "uModel", &inst.transform.matrix());
 
             self.shader.set_vec4(gl, "uColor", &inst.material.color);
 

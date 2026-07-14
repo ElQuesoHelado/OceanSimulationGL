@@ -13,6 +13,11 @@ impl Instance {
     pub fn new(mesh_id: MeshId, material: Material) -> Self {
         let mut transform = Transform::new();
         match mesh_id {
+            MeshId::Boat | MeshId::PalmTree => transform.scale(vec3(500f32, 500f32, 500f32)),
+            MeshId::SailShip => transform.scale(vec3(2000f32, 2000f32, 2000f32)),
+            MeshId::SailBoat => transform.scale(vec3(3000f32, 3000f32, 3000f32)),
+            MeshId::Island => transform.scale(vec3(0.9f32, 0.9f32, 0.9f32)),
+            MeshId::EmptyIsland => transform.scale(vec3(20f32, 20f32, 20f32)),
             _ => transform.scale(vec3(10f32, 10f32, 10f32)),
         };
 
@@ -53,34 +58,6 @@ impl Scene {
         self.billboard_instances.push(instance);
         self.billboard_instances.len() - 1
     }
-
-    // pub fn add_instance(&mut self, texture_library: &TextureLibrary, texture_name: &str) {
-    //     let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 32., tex)
-    //         .expect("Textura no encontrada");
-    //
-    //     self.bill_instances.push(Instance {
-    //         transform: Transform::new(),
-    //         mesh_id: MeshId::Billboard,
-    //         material,
-    //     });
-    // }
-
-    // pub fn add_bill_instance_transformed(
-    //     &mut self,
-    //     transform: Transform,
-    //     texture_library: &TextureLibrary,
-    // ) -> usize {
-    //     let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 32., "blank")
-    //         .expect("Textura no encontrada");
-    //
-    //     self.bill_instances.push(Instance {
-    //         transform,
-    //         mesh_id: MeshId::Billboard,
-    //         material,
-    //     });
-    //
-    //     self.bill_instances.len() - 1
-    // }
 
     pub fn get_instance_mut(&mut self, id: usize) -> Option<&mut Instance> {
         self.normal_instances.get_mut(id)

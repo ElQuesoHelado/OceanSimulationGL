@@ -109,7 +109,7 @@ pub fn select_mesh(
         .iter()
         .enumerate()
         .filter(|(_, m)| {
-            let (lo, ld) = ray_to_local(ray_origin, ray_dir, m.transform.mat);
+            let (lo, ld) = ray_to_local(ray_origin, ray_dir, m.transform.matrix());
 
             let Some(mesh) = mesh_library.get(m.mesh_id) else {
                 return false;
@@ -134,12 +134,12 @@ pub fn select_mesh(
 
             let dist_a = a
                 .transform
-                .mat
+                .matrix()
                 .transform_point3(center_a)
                 .distance(ray_origin);
             let dist_b = b
                 .transform
-                .mat
+                .matrix()
                 .transform_point3(center_b)
                 .distance(ray_origin);
 

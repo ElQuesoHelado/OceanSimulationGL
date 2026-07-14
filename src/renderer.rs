@@ -241,7 +241,7 @@ impl OceanRenderer {
         for inst in instances {
             // let inst = &instances[self.instance_id];
 
-            self.shader.set_mat4(gl, "uModel", &inst.transform.mat);
+            self.shader.set_mat4(gl, "uModel", &inst.transform.matrix());
             self.shader.set_vec4(gl, "uColor", &inst.material.color);
             self.shader
                 .set_float(gl, "uShininess", inst.material.shininess);

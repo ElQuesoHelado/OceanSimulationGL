@@ -20,10 +20,10 @@ impl App {
         // Simulations
 
         // state.rain.update(&mut state.scene, 0.11f32);
-        state
-            .simulation
-            .ocean
-            .update(&mut state.scene.normal_instances, state.time);
+        // state
+        //     .simulation
+        //     .ocean
+        //     .update(&mut state.scene.normal_instances, state.time);
 
         // state.process_input();
         // state.input.end_frame();
@@ -50,7 +50,7 @@ impl App {
             state.time,
         );
 
-        // let identity = glam::Mat4::IDENTITY;
+        let identity = glam::Mat4::IDENTITY;
         // state.floor_giz_renderer.draw(
         //     state.graph_ctx.gl(),
         //     &state.floor_gizmo.floor,
@@ -59,15 +59,15 @@ impl App {
         //     &state.camera.projection(),
         //     state.floor_gizmo.floor_color,
         // );
-        //
-        // state.floor_giz_renderer.draw(
-        //     state.graph_ctx.gl(),
-        //     &state.floor_gizmo.gizmo,
-        //     &identity,
-        //     &state.camera.view(),
-        //     &state.camera.projection(),
-        //     state.floor_gizmo.gizmo_color,
-        // );
+
+        state.floor_giz_renderer.draw(
+            state.graph_ctx.gl(),
+            &state.floor_gizmo.gizmo,
+            &identity,
+            &state.camera.view(),
+            &state.camera.projection(),
+            state.floor_gizmo.gizmo_color,
+        );
 
         //Render ImGui
         unsafe {

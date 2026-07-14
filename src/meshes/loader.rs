@@ -44,6 +44,28 @@ pub fn load_mesh(path: &str) -> Result<MeshData, Error> {
 
     let positions = positions.leak();
 
+    println!(
+        "pos: {}, normls: {}, texcoords: {}, indices: {}",
+        positions.len(),
+        normals.len(),
+        texcoords.len(),
+        indices.len()
+    );
+
+    let mut min = positions[0];
+    let mut max = positions[0];
+
+    for p in &positions[1..] {
+        for i in 0..3 {
+            min[i] = min[i].min(p[i]);
+            max[i] = max[i].max(p[i]);
+        }
+    }
+
+    println!("x: min = {}, max = {}", min[0], max[0]);
+    println!("y: min = {}, max = {}", min[1], max[1]);
+    println!("z: min = {}, max = {}", min[2], max[2]);
+
     Ok(MeshData {
         positions,
         normals: normals.leak(),

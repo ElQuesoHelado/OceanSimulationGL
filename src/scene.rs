@@ -1,4 +1,4 @@
-use glam::vec4;
+use glam::{vec3, vec4};
 
 use crate::{material::Material, meshes::mesh::MeshId, mops::Transform, texture::TextureLibrary};
 
@@ -11,8 +11,13 @@ pub struct Instance {
 
 impl Instance {
     pub fn new(mesh_id: MeshId, material: Material) -> Self {
+        let mut transform = Transform::new();
+        match mesh_id {
+            _ => transform.scale(vec3(10f32, 10f32, 10f32)),
+        };
+
         Self {
-            transform: Transform::new(),
+            transform,
             mesh_id,
             material,
         }

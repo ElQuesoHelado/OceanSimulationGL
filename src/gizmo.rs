@@ -1,4 +1,4 @@
-use crate::mesh::SimpleMesh;
+use crate::meshes::mesh::SimpleMesh;
 
 pub struct FloorGizmo {
     pub gizmo: SimpleMesh,

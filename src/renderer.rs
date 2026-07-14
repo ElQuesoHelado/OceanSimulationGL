@@ -6,7 +6,7 @@ use crate::{
     camera::Camera,
     light::Light,
     material::Material,
-    mesh::{MeshLibrary, SimpleMesh},
+    meshes::mesh::{MeshId, MeshLibrary, SimpleMesh},
     scene::{self, Instance, Scene},
     shader::Shader,
     simulations::{Simulation, ocean::Wave},
@@ -209,7 +209,7 @@ impl OceanRenderer {
         let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 256., "ocean")
             .expect("Textura no encontrada");
 
-        let instance = Instance::new(crate::mesh::MeshId::Plane, material);
+        let instance = Instance::new(MeshId::Plane, material);
         let instance_id = scene.add_ocean_instance(instance);
 
         Ok(Self {

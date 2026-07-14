@@ -1,5 +1,3 @@
-use super::*;
-
 // TODO: cambio a "particulas" genericas, en base a fuerza
 // - Check con delets de figuras
 
@@ -8,7 +6,7 @@ use rand::RngExt;
 
 use crate::{
     material::Material,
-    mesh::MeshId,
+    meshes::mesh::MeshId,
     mops::Transform,
     scene::{Instance, Scene},
     texture::TextureLibrary,

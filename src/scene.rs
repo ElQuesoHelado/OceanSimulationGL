@@ -1,6 +1,6 @@
 use glam::vec4;
 
-use crate::{material::Material, mesh::MeshId, mops::Transform, texture::TextureLibrary};
+use crate::{material::Material, meshes::mesh::MeshId, mops::Transform, texture::TextureLibrary};
 
 #[derive(Clone)]
 pub struct Instance {

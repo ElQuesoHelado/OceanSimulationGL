@@ -14,6 +14,13 @@ const MESH_OPTIONS: &[(&str, MeshId)] = &[
     ("Cono", MeshId::Cone),
     ("Billboard", MeshId::Billboard),
     ("Plane", MeshId::Plane),
+    ("Boat", MeshId::Boat),
+    ("EmptyIsland", MeshId::EmptyIsland),
+    ("Grass", MeshId::Grass),
+    ("Island", MeshId::Island),
+    ("PalmTree", MeshId::PalmTree),
+    ("SailBoat", MeshId::SailBoat),
+    ("SailShip", MeshId::SailShip),
 ];
 
 pub fn build_ui(

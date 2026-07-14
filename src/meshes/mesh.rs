@@ -1,7 +1,7 @@
+use crate::meshes::mesh_data;
+use crate::meshes::mesh_data::MeshData;
 use glam::{Vec3, vec3};
 use glow::HasContext;
-
-use crate::mesh_data;
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum MeshId {
@@ -16,6 +16,13 @@ pub enum MeshId {
     Torus,
     Billboard,
     Plane,
+    Boat,
+    EmptyIsland,
+    Grass,
+    Island,
+    PalmTree,
+    SailBoat,
+    SailShip,
 }
 
 // Bebita de todos los meshes base
@@ -37,6 +44,13 @@ impl MeshLibrary {
             Mesh::upload(gl, mesh_data::torus()),
             Mesh::upload(gl, mesh_data::billboard()),
             Mesh::upload(gl, mesh_data::plane(400)),
+            Mesh::upload(gl, mesh_data::boat()),
+            Mesh::upload(gl, mesh_data::empty_island()),
+            Mesh::upload(gl, mesh_data::grass()),
+            Mesh::upload(gl, mesh_data::island()),
+            Mesh::upload(gl, mesh_data::palm_tree()),
+            Mesh::upload(gl, mesh_data::sail_boat()),
+            Mesh::upload(gl, mesh_data::sail_ship()),
         ];
 
         Self { meshes }
@@ -80,15 +94,6 @@ impl AABB {
             max_point,
         }
     }
-}
-
-// Datos crudos de un mesh(Cube, Sphere, ...)
-pub struct MeshData {
-    pub positions: &'static [[f32; 3]],
-    pub normals: &'static [[f32; 3]],
-    pub texcoords: &'static [[f32; 2]],
-    pub indices: &'static [u32],
-    pub aabb: AABB,
 }
 
 // Mesh cargado

@@ -121,15 +121,15 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary) -> usize {
     let mut palm2 = Instance::new(MeshId::PalmTree, green_material);
     palm2.transform.set_position(vec3(180f32, 10f32, 200f32));
 
-    let mut sun = Instance::new(MeshId::Sphere, sun_material);
-    sun.transform.set_position(vec3(-200f32, 300f32, -200f32));
-    sun.transform.scale(vec3(10f32, 10f32, 10f32));
+    let mut sun = Instance::new(MeshId::Billboard, sun_material);
+    sun.transform.set_position(vec3(-200f32, 500f32, -200f32));
+    sun.transform.scale(vec3(5f32, 10f32, 5f32));
 
     scene.add_normal_instance(island1);
     scene.add_normal_instance(island2);
     scene.add_normal_instance(palm1);
     scene.add_normal_instance(palm2);
-    scene.add_normal_instance(sun);
+    scene.add_billboard_instance(sun);
 
     scene.normal_instances.len()
 }

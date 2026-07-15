@@ -5,7 +5,8 @@ use glam::{Mat4, Vec3};
 
 //Todo en Rads
 pub struct Camera {
-    pub target: Vec3,
+    //pub target: Vec3,
+    pub eye: Vec3,
     pub distance: f32,
     pub yaw: f32,
     pub pitch: f32,
@@ -18,7 +19,7 @@ pub struct Camera {
 impl Camera {
     pub fn new(aspect: f32) -> Self {
         Self {
-            target: Vec3::new(50., 0., 50.),
+            eye: Vec3::new(100., 50., 100.),
             distance: 300.,
             yaw: 0.5,
             pitch: 0.3,
@@ -29,16 +30,28 @@ impl Camera {
         }
     }
 
-    pub fn eye(&self) -> Vec3 {
+    // pub fn eye(&self) -> Vec3 {
+    //     Vec3::new(
+    //         self.target.x + self.distance * self.pitch.cos() * self.yaw.cos(),
+    //         self.target.y + self.distance * self.pitch.sin(),
+    //         self.target.z + self.distance * self.pitch.cos() * self.yaw.sin(),
+    //     )
+    // }
+    pub fn forward(&self) -> Vec3 {
         Vec3::new(
-            self.target.x + self.distance * self.pitch.cos() * self.yaw.cos(),
-            self.target.y + self.distance * self.pitch.sin(),
-            self.target.z + self.distance * self.pitch.cos() * self.yaw.sin(),
+            self.pitch.cos() * self.yaw.cos(),
+            self.pitch.sin(),
+            self.pitch.cos() * self.yaw.sin(),
         )
+        .normalize()
+    }
+
+    pub fn target(&self) -> Vec3 {
+        self.eye + self.forward() * self.distance
     }
 
     pub fn view(&self) -> Mat4 {
-        look_at_mat4(self.eye(), self.target, Vec3::Y)
+        look_at_mat4(self.eye, self.target(), Vec3::Y)
     }
 
     pub fn projection(&self) -> Mat4 {
@@ -48,24 +61,31 @@ impl Camera {
     pub fn orbit(&mut self, dx: f32, dy: f32) {
         self.yaw += dx * 0.01;
         self.pitch += dy * 0.01;
-
-        self.pitch = self.pitch.clamp(-PI / 2.1f32, PI / 2.1f32);
+        self.pitch = self.pitch.clamp(-PI / 2.1, PI / 2.1);
     }
 
     pub fn zoom(&mut self, delta: f32) {
-        self.distance *= (1.0 - delta * 0.1);
-        self.distance = self.distance.max(0.1);
+        self.eye += self.forward() * delta * self.distance * 0.1;
     }
 
-    pub fn pan(&mut self, dx: f32, dy: f32) {
-        let forward = (self.target - self.eye()).normalize();
-        let right = (forward.cross(Vec3::new(0., 1., 0.))).normalize();
-        let up = right.cross(forward).normalize();
+    // pub fn pan(&mut self, dx: f32, dy: f32) {
+    //     let forward = (self.target - self.eye()).normalize();
+    //     let right = (forward.cross(Vec3::new(0., 1., 0.))).normalize();
+    //     let up = right.cross(forward).normalize();
+    //
+    //     let speed = self.distance * 0.001;
+    //
+    //     self.target -= right * dx * speed;
+    //     self.target += up * dy * speed;
+    // }
 
-        let speed = self.distance * 0.001;
+    pub fn fly(&mut self, forward_input: f32, right_input: f32, up_input: f32, dt: f32) {
+        let fwd = self.forward();
+        let right = fwd.cross(Vec3::Y).normalize();
+        let up = Vec3::Y;
 
-        self.target -= right * dx * speed;
-        self.target += up * dy * speed;
+        let speed = 50.0;
+        self.eye += (fwd * forward_input + right * right_input + up * up_input) * speed * dt;
     }
 
     pub fn set_aspect(&mut self, width: f32, height: f32) {

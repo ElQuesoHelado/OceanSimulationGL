@@ -32,15 +32,16 @@ impl App {
                 let alt = state.input.key_pressed(KeyCode::AltLeft);
                 let shift = state.input.key_pressed(KeyCode::ShiftLeft);
                 let left_mouse = state.input.mouse_button_pressed(MouseButton::Left);
+                let right_mouse = state.input.mouse_button_pressed(MouseButton::Right);
 
                 if want_mouse {
                     return;
                 }
 
-                if alt && left_mouse {
-                    state.camera.orbit(dx as f32, dy as f32);
+                if (alt && left_mouse) || right_mouse {
+                    state.camera.orbit(dx as f32, -dy as f32);
                 } else if shift && left_mouse {
-                    state.camera.pan(dx as f32, dy as f32);
+                    // state.camera.pan(dx as f32, dy as f32);
                 }
             }
             WindowEvent::MouseInput {
@@ -100,12 +101,19 @@ impl App {
                 if let PhysicalKey::Code(code) = event.physical_key {
                     state.input.on_keyboard_input(code, event.state);
 
-                    if code == KeyCode::Escape {
-                        event_loop.exit();
-                    }
+                    match code {
+                        KeyCode::Escape => event_loop.exit(),
+                        KeyCode::Backquote => {
+                            state.ui_state.clear_selected_instance(&mut state.scene)
+                        }
+                        KeyCode::KeyW => state.camera.fly(1.0, 0.0, 0.0, 0.1),
+                        KeyCode::KeyS => state.camera.fly(-1.0, 0.0, 0.0, 0.1),
+                        KeyCode::KeyD => state.camera.fly(0.0, 1.0, 0.0, 0.1),
+                        KeyCode::KeyA => state.camera.fly(0.0, -1.0, 0.0, 0.1),
+                        KeyCode::KeyQ => state.camera.fly(0.0, 0.0, -1.0, 0.1),
+                        KeyCode::KeyE => state.camera.fly(0.0, 0.0, 1.0, 0.1),
 
-                    if code == KeyCode::Backquote {
-                        state.ui_state.clear_selected_instance(&mut state.scene);
+                        _ => (),
                     }
                 }
             }

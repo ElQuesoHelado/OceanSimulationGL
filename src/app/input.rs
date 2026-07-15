@@ -164,7 +164,7 @@ impl UiState {
             mouse_y,
             window.inner_size().width as f32,
             window.inner_size().height as f32,
-            camera.eye(),
+            camera.eye,
             camera.view(),
             camera.projection(),
         ));

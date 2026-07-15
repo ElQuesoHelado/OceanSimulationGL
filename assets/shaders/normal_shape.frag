@@ -28,7 +28,7 @@ void main()
 
   if(uLightingEnabled){
     // Ambiental
-    float ambientStrength = 0.4;
+    float ambientStrength = 0.5;
     vec3 ambient = ambientStrength * uLightColor;
 
     // Difusa
@@ -36,7 +36,7 @@ void main()
     vec3 lightDir = normalize(uLightPos - FragPos);
 
     float diff = max(dot(norm, lightDir), 0.0);
-    float diffuseStrength = 2;
+    float diffuseStrength = 0.7;
     vec3 diffuse = diffuseStrength * diff * uLightColor;
 
     // Especular (Blinn-Phong)

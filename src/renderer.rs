@@ -42,7 +42,7 @@ impl StandardRenderer {
         self.shader.set_bool(gl, "uLightingEnabled", light.enabled);
         self.shader.set_vec3(gl, "uLightPos", &light.pos);
         self.shader.set_vec3(gl, "uLightColor", &light.color);
-        self.shader.set_vec3(gl, "uEye", &camera.eye());
+        self.shader.set_vec3(gl, "uEye", &camera.eye);
 
         for inst in instances {
             self.shader.set_mat4(gl, "uModel", &inst.transform.matrix());
@@ -235,7 +235,7 @@ impl OceanRenderer {
         self.shader.set_bool(gl, "uLightingEnabled", light.enabled);
         self.shader.set_vec3(gl, "uLightPos", &light.pos);
         self.shader.set_vec3(gl, "uLightColor", &light.color);
-        self.shader.set_vec3(gl, "uEye", &camera.eye());
+        self.shader.set_vec3(gl, "uEye", &camera.eye);
         self.shader.set_float(gl, "time", time);
 
         for inst in instances {

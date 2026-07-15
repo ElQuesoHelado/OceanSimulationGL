@@ -21,8 +21,8 @@ impl Instance {
             MeshId::SailBoat => transform
                 .scale(vec3(3000f32, 3000f32, 3000f32))
                 .rotate_x(-PI / 2f32),
-            MeshId::Island => transform.scale(vec3(0.9f32, 0.9f32, 0.9f32)),
-            MeshId::EmptyIsland => transform.scale(vec3(20f32, 20f32, 20f32)),
+            MeshId::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
+            MeshId::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
             MeshId::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
             _ => transform.scale(vec3(10f32, 10f32, 10f32)),
         };

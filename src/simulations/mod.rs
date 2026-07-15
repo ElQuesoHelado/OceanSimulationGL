@@ -14,7 +14,7 @@ impl Simulation {
     pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
         Self {
             rain: Rain::new(scene, texture_library, 10),
-            ocean: Ocean::new(),
+            ocean: Ocean::new(scene, texture_library),
         }
     }
 

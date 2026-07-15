@@ -1,8 +1,13 @@
 use std::f32::consts::PI;
 
-use glam::{Quat, Vec3};
+use glam::{Quat, Vec3, Vec4, vec3, vec4};
 
-use crate::scene::Instance;
+use crate::{
+    material::Material,
+    meshes::mesh::MeshId,
+    scene::{Instance, Scene},
+    texture::TextureLibrary,
+};
 
 pub struct Wave {
     pub amplitude: f32,
@@ -13,6 +18,7 @@ pub struct Wave {
 
 pub struct Ocean {
     pub waves: Vec<Wave>,
+    pub inst_idx_start: usize, // Inicio de indices a simular
 }
 
 fn wave_height_and_normal(x: f32, z: f32, time: f32, waves: &[Wave]) -> (f32, Vec3) {
@@ -42,8 +48,7 @@ fn wave_height_and_normal(x: f32, z: f32, time: f32, waves: &[Wave]) -> (f32, Ve
 }
 
 impl Ocean {
-    // pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
-    pub fn new() -> Self {
+    pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
         let waves: Vec<Wave> = vec![
             Wave {
                 amplitude: 0.6f32,
@@ -71,11 +76,16 @@ impl Ocean {
             },
         ];
 
-        Self { waves }
+        let inst_idx_start = setup(scene, texture_library);
+
+        Self {
+            waves,
+            inst_idx_start,
+        }
     }
 
     pub fn update(&mut self, instances: &mut [Instance], time: f32) {
-        for inst in instances {
+        for inst in &mut instances[self.inst_idx_start..] {
             let trans = &mut inst.transform;
             let (height, normal) =
                 wave_height_and_normal(trans.get_x(), trans.get_z(), time, &self.waves);
@@ -84,4 +94,42 @@ impl Ocean {
                 .set_rotation(Quat::from_axis_angle(normal, PI));
         }
     }
+}
+
+fn setup(scene: &mut Scene, texture_library: &TextureLibrary) -> usize {
+    let sun_material = Material::new(texture_library, Vec4::ONE, 200f32, "hinojosa")
+        .expect("Error cargando textura");
+
+    let wood_material = Material::new(texture_library, Vec4::ONE, 32f32, "roof_wood")
+        .expect("Error cargando textura");
+
+    let green_material = Material::new(texture_library, vec4(0.5, 0.8, 0.5, 1f32), 3000f32, "tree")
+        .expect("Error cargando textura");
+
+    let sand_material = Material::new(texture_library, vec4(1.0, 0.7, 0.55, 1f32), 32f32, "blank")
+        .expect("Error cargando textura");
+
+    let mut island1 = Instance::new(MeshId::Island, green_material);
+    island1.transform.set_position(vec3(100f32, 5f32, 50f32));
+
+    let mut island2 = Instance::new(MeshId::EmptyIsland, sand_material);
+    island2.transform.set_position(vec3(150f32, 5f32, 200f32));
+
+    let mut palm1 = Instance::new(MeshId::PalmTree, green_material);
+    palm1.transform.set_position(vec3(150f32, 13f32, 200f32));
+
+    let mut palm2 = Instance::new(MeshId::PalmTree, green_material);
+    palm2.transform.set_position(vec3(180f32, 10f32, 200f32));
+
+    let mut sun = Instance::new(MeshId::Sphere, sun_material);
+    sun.transform.set_position(vec3(-200f32, 300f32, -200f32));
+    sun.transform.scale(vec3(10f32, 10f32, 10f32));
+
+    scene.add_normal_instance(island1);
+    scene.add_normal_instance(island2);
+    scene.add_normal_instance(palm1);
+    scene.add_normal_instance(palm2);
+    scene.add_normal_instance(sun);
+
+    scene.normal_instances.len()
 }

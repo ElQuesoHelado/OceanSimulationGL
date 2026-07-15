@@ -1,3 +1,5 @@
+use std::f32::consts::FRAC_PI_2;
+
 use crate::meshes::{loader::load_mesh, mesh::AABB};
 use bytemuck::cast_slice;
 
@@ -196,9 +198,9 @@ pub fn plane(n_points: usize) -> MeshData {
     for i in 0..n_points {
         for j in 0..n_points {
             positions.push([
-                i as f32 / (n_points - 1) as f32 * 200.0,
+                i as f32 / (n_points - 1) as f32 * 300.0,
                 0.0,
-                j as f32 / (n_points - 1) as f32 * 200.0,
+                j as f32 / (n_points - 1) as f32 * 300.0,
             ]);
             normals.push([0.0, 1.0, 0.0]);
         }
@@ -249,29 +251,33 @@ pub fn plane(n_points: usize) -> MeshData {
 }
 
 pub fn boat() -> MeshData {
-    load_mesh("assets/raw_meshes/Boat.glb").expect("Error al cargar Mesh")
+    load_mesh("assets/raw_meshes/Boat.glb", None).expect("Error al cargar Mesh")
 }
 
 pub fn empty_island() -> MeshData {
-    load_mesh("assets/raw_meshes/EmptyIsland.glb").expect("Error al cargar Mesh")
+    load_mesh("assets/raw_meshes/EmptyIsland.glb", None).expect("Error al cargar Mesh")
 }
 
 pub fn grass() -> MeshData {
-    load_mesh("assets/raw_meshes/Grass.glb").expect("Error al cargar Mesh")
+    load_mesh("assets/raw_meshes/Grass.glb", None).expect("Error al cargar Mesh")
 }
 
 pub fn island() -> MeshData {
-    load_mesh("assets/raw_meshes/Island.glb").expect("Error al cargar Mesh")
+    load_mesh("assets/raw_meshes/Island.glb", None).expect("Error al cargar Mesh")
 }
 
 pub fn palm_tree() -> MeshData {
-    load_mesh("assets/raw_meshes/PalmTree.glb").expect("Error al cargar Mesh")
+    load_mesh("assets/raw_meshes/PalmTree.glb", None).expect("Error al cargar Mesh")
 }
 
 pub fn sail_boat() -> MeshData {
-    load_mesh("assets/raw_meshes/SailBoat.glb").expect("Error al cargar Mesh")
+    load_mesh(
+        "assets/raw_meshes/SailBoat.glb",
+        Some(glam::Quat::from_rotation_x(-FRAC_PI_2)),
+    )
+    .expect("Error al cargar Mesh")
 }
 
-pub fn sail_ship() -> MeshData {
-    load_mesh("assets/raw_meshes/SailShip.glb").expect("Error al cargar Mesh")
+pub fn ship() -> MeshData {
+    load_mesh("assets/raw_meshes/Ship.glb", None).expect("Error al cargar Mesh")
 }

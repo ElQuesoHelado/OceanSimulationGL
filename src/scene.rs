@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use glam::{vec3, vec4};
 
 use crate::{material::Material, meshes::mesh::MeshId, mops::Transform, texture::TextureLibrary};
@@ -14,10 +16,14 @@ impl Instance {
         let mut transform = Transform::new();
         match mesh_id {
             MeshId::Boat | MeshId::PalmTree => transform.scale(vec3(500f32, 500f32, 500f32)),
-            MeshId::SailShip => transform.scale(vec3(2000f32, 2000f32, 2000f32)),
-            MeshId::SailBoat => transform.scale(vec3(3000f32, 3000f32, 3000f32)),
+            MeshId::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
+            // .rotate_x(-PI / 2f32),
+            MeshId::SailBoat => transform
+                .scale(vec3(3000f32, 3000f32, 3000f32))
+                .rotate_x(-PI / 2f32),
             MeshId::Island => transform.scale(vec3(0.9f32, 0.9f32, 0.9f32)),
             MeshId::EmptyIsland => transform.scale(vec3(20f32, 20f32, 20f32)),
+            MeshId::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
             _ => transform.scale(vec3(10f32, 10f32, 10f32)),
         };
 

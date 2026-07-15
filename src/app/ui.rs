@@ -20,7 +20,7 @@ const MESH_OPTIONS: &[(&str, MeshId)] = &[
     ("Island", MeshId::Island),
     ("PalmTree", MeshId::PalmTree),
     ("SailBoat", MeshId::SailBoat),
-    ("SailShip", MeshId::SailShip),
+    ("Ship", MeshId::Ship),
 ];
 
 pub fn build_ui(

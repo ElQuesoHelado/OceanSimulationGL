@@ -30,16 +30,19 @@ impl Transform {
         self
     }
 
-    pub fn rotate_x(&mut self, rads: f32) {
+    pub fn rotate_x(&mut self, rads: f32) -> &mut Self {
         self.rotation *= Quat::from_rotation_x(rads);
+        self
     }
 
-    pub fn rotate_y(&mut self, rads: f32) {
+    pub fn rotate_y(&mut self, rads: f32) -> &mut Self {
         self.rotation *= Quat::from_rotation_y(rads);
+        self
     }
 
-    pub fn rotate_z(&mut self, rads: f32) {
+    pub fn rotate_z(&mut self, rads: f32) -> &mut Self {
         self.rotation *= Quat::from_rotation_z(rads);
+        self
     }
 
     pub fn rotate_axis(&mut self, rads: f32, axis: Vec3) -> &mut Self {
@@ -53,6 +56,11 @@ impl Transform {
 
     pub fn set_position(&mut self, position: Vec3) -> &Self {
         self.translation = position;
+        self
+    }
+
+    pub fn set_rotation(&mut self, rotation: Quat) -> &Self {
+        self.rotation = rotation;
         self
     }
 

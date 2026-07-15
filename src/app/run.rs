@@ -19,14 +19,12 @@ impl App {
 
         // Simulations
 
-        // state.rain.update(&mut state.scene, 0.11f32);
-        // state
-        //     .simulation
-        //     .ocean
-        //     .update(&mut state.scene.normal_instances, state.time);
+        //state.simulation.rain.update(&mut state.scene, 0.11f32);
 
-        // state.process_input();
-        // state.input.end_frame();
+        state
+            .simulation
+            .ocean
+            .update(&mut state.scene.normal_instances, state.time);
 
         state.graph_ctx.clear();
         state.standard_renderer.draw(

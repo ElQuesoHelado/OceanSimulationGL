@@ -22,7 +22,7 @@ pub enum MeshId {
     Island,
     PalmTree,
     SailBoat,
-    SailShip,
+    Ship,
 }
 
 // Bebita de todos los meshes base
@@ -50,7 +50,7 @@ impl MeshLibrary {
             Mesh::upload(gl, mesh_data::island()),
             Mesh::upload(gl, mesh_data::palm_tree()),
             Mesh::upload(gl, mesh_data::sail_boat()),
-            Mesh::upload(gl, mesh_data::sail_ship()),
+            Mesh::upload(gl, mesh_data::ship()),
         ];
 
         Self { meshes }

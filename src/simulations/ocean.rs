@@ -1,10 +1,8 @@
 use std::f32::consts::PI;
 
-use glam::Vec3;
+use glam::{Quat, Vec3};
 
 use crate::scene::Instance;
-
-use super::*;
 
 pub struct Wave {
     pub amplitude: f32,
@@ -82,6 +80,8 @@ impl Ocean {
             let (height, normal) =
                 wave_height_and_normal(trans.get_x(), trans.get_z(), time, &self.waves);
             inst.transform.set_pos_y(height);
+            inst.transform
+                .set_rotation(Quat::from_axis_angle(normal, PI));
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::simulations::ocean::Ocean;
+use crate::{scene::Skybox, simulations::ocean::Ocean};
 
 use super::*;
 
@@ -109,6 +109,9 @@ impl App {
             pos: vec3(150f32, 50f32, 150f32),
             color: vec3(1f32, 1f32, 1f32),
         };
+
+        let skybox = Skybox::new(&texture_library, "SanFrancisco");
+        scene.set_skybox_instance(skybox);
 
         //*************************
         // Simulation

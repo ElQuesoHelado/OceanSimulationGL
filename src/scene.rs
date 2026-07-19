@@ -39,18 +39,20 @@ impl Instance {
 pub struct Skybox {
     pub transform: Transform,
     pub mesh_id: MeshId,
-    pub material: Material,
+    pub cube_map_id: u32,
 }
 
 impl Skybox {
-    pub fn new(material: Material) -> Self {
+    pub fn new(texture_library: &TextureLibrary, texture_name: &str) -> Option<Self> {
         let transform = Transform::new();
 
-        Self {
+        let cube_map_id = texture_library.get_id_from_name(texture_name)?;
+
+        Some(Self {
             transform,
             mesh_id: MeshId::Cube,
-            material,
-        }
+            cube_map_id,
+        })
     }
 }
 
@@ -76,8 +78,8 @@ impl Scene {
         self.normal_instances.len() - 1
     }
 
-    pub fn set_skybox_instance(&mut self, skybox: Skybox) {
-        self.skybox = Some(skybox);
+    pub fn set_skybox_instance(&mut self, skybox: Option<Skybox>) {
+        self.skybox = skybox;
     }
 
     pub fn add_ocean_instance(&mut self, instance: Instance) -> usize {

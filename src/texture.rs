@@ -58,10 +58,9 @@ impl TextureLibrary {
                 .into_owned();
 
             if file_type.is_dir() {
-                println!("Checked dir: {}", path);
-
                 match CubeMap::new(gl, &path) {
                     Ok(cube_map) => {
+                        //println!("Cubemap name: {}", name);
                         let len_map = cube_maps.len() as u32;
                         cube_maps.insert(len_map, cube_map);
                         names.insert(name, len_map);
@@ -163,8 +162,6 @@ pub struct CubeMap {
 
 impl CubeMap {
     pub fn new(gl: &glow::Context, dir_path: &str) -> Result<Self, String> {
-        println!("Loading cubemap {}", dir_path);
-
         let posx = format!("{}/posx.png", dir_path);
         let negx = format!("{}/negx.png", dir_path);
         let posy = format!("{}/posy.png", dir_path);
@@ -181,8 +178,6 @@ impl CubeMap {
             (glow::TEXTURE_CUBE_MAP_NEGATIVE_Z, &negz),
         ];
 
-        use std::time::Instant;
-
         unsafe {
             let texture = gl.create_texture()?;
 
@@ -190,11 +185,8 @@ impl CubeMap {
             gl.bind_texture(glow::TEXTURE_CUBE_MAP, None);
 
             for (cube_map_orientation, path) in &faces {
-                let t = Instant::now();
                 let img = image::open(path).map_err(|e| e.to_string())?.into_rgba8();
                 let (width, height) = img.dimensions();
-
-                println!("decode {:?}", t.elapsed());
 
                 gl.tex_image_2d(
                     *cube_map_orientation,

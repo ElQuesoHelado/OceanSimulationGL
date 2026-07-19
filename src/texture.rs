@@ -1,10 +1,12 @@
 use glow::HasContext;
+use image::{ImageBuffer, Rgba};
 use std::io;
 use std::{collections::HashMap, fs};
 
 pub struct TextureLibrary {
     pub names: HashMap<String, u32>,
     pub textures: HashMap<u32, Texture>, // u32 como Ids
+    pub cube_maps: HashMap<u32, CubeMap>,
 }
 
 impl TextureLibrary {
@@ -23,10 +25,17 @@ impl TextureLibrary {
     pub fn new(gl: &glow::Context, dir_path: &str) -> Self {
         let mut names: HashMap<String, u32> = HashMap::new();
         let mut textures: HashMap<u32, Texture> = HashMap::new();
+        let mut cube_maps: HashMap<u32, CubeMap> = HashMap::new();
 
         let entries = match fs::read_dir(dir_path) {
             Ok(entries) => entries,
-            Err(_) => return Self { names, textures },
+            Err(_) => {
+                return Self {
+                    names,
+                    textures,
+                    cube_maps,
+                };
+            }
         };
 
         for entry in entries {
@@ -35,9 +44,10 @@ impl TextureLibrary {
                 Err(_) => continue,
             };
 
-            if !entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
-                continue;
-            }
+            let file_type = match entry.file_type() {
+                Ok(ft) => ft,
+                Err(_) => continue,
+            };
 
             let path = entry.path().to_string_lossy().to_string();
             let name = entry
@@ -47,21 +57,39 @@ impl TextureLibrary {
                 .to_string_lossy()
                 .into_owned();
 
-            // println!("{}", &entry.path().to_string_lossy());
+            if file_type.is_dir() {
+                println!("Checked dir: {}", path);
 
-            match Texture::new(gl, &path) {
-                Ok(texture) => {
-                    let len_map = textures.len() as u32;
-                    textures.insert(len_map, texture);
-                    names.insert(name, len_map);
+                match CubeMap::new(gl, &path) {
+                    Ok(cube_map) => {
+                        let len_map = cube_maps.len() as u32;
+                        cube_maps.insert(len_map, cube_map);
+                        names.insert(name, len_map);
+                    }
+                    Err(e) => {
+                        println!("{}", e);
+                        continue;
+                    }
                 }
-                Err(e) => {
-                    println!("{}", e);
-                    continue;
+            } else if file_type.is_file() {
+                match Texture::new(gl, &path) {
+                    Ok(texture) => {
+                        let len_map = textures.len() as u32;
+                        textures.insert(len_map, texture);
+                        names.insert(name, len_map);
+                    }
+                    Err(e) => {
+                        println!("{}", e);
+                        continue;
+                    }
                 }
             }
         }
-        Self { names, textures }
+        Self {
+            names,
+            textures,
+            cube_maps,
+        }
     }
 }
 
@@ -113,6 +141,105 @@ impl Texture {
                 channels: 4,
                 path: path.to_string(),
             })
+        }
+    }
+
+    pub fn drop(&self, gl: &glow::Context) {
+        unsafe {
+            gl.delete_texture(self.id);
+        }
+    }
+}
+
+pub struct CubeMap {
+    pub id: glow::Texture,
+    // pub p_posx: String,
+    // pub p_posy: String,
+    // pub p_posz: String,
+    // pub p_negx: String,
+    // pub p_negy: String,
+    // pub p_negz: String,
+}
+
+impl CubeMap {
+    pub fn new(gl: &glow::Context, dir_path: &str) -> Result<Self, String> {
+        println!("Loading cubemap {}", dir_path);
+
+        let posx = format!("{}/posx.png", dir_path);
+        let negx = format!("{}/negx.png", dir_path);
+        let posy = format!("{}/posy.png", dir_path);
+        let negy = format!("{}/negy.png", dir_path);
+        let posz = format!("{}/posz.png", dir_path);
+        let negz = format!("{}/negz.png", dir_path);
+
+        let faces: [(u32, &str); 6] = [
+            (glow::TEXTURE_CUBE_MAP_POSITIVE_X, &posx),
+            (glow::TEXTURE_CUBE_MAP_NEGATIVE_X, &negx),
+            (glow::TEXTURE_CUBE_MAP_POSITIVE_Y, &posy),
+            (glow::TEXTURE_CUBE_MAP_NEGATIVE_Y, &negy),
+            (glow::TEXTURE_CUBE_MAP_POSITIVE_Z, &posz),
+            (glow::TEXTURE_CUBE_MAP_NEGATIVE_Z, &negz),
+        ];
+
+        use std::time::Instant;
+
+        unsafe {
+            let texture = gl.create_texture()?;
+
+            gl.bind_texture(glow::TEXTURE_CUBE_MAP, Some(texture));
+            gl.bind_texture(glow::TEXTURE_CUBE_MAP, None);
+
+            for (cube_map_orientation, path) in &faces {
+                let t = Instant::now();
+                let img = image::open(path).map_err(|e| e.to_string())?.into_rgba8();
+                let (width, height) = img.dimensions();
+
+                println!("decode {:?}", t.elapsed());
+
+                gl.tex_image_2d(
+                    *cube_map_orientation,
+                    0,
+                    glow::RGBA8 as i32,
+                    width as i32,
+                    height as i32,
+                    0,
+                    glow::RGBA,
+                    glow::UNSIGNED_BYTE,
+                    glow::PixelUnpackData::Slice(Some(img.as_raw())),
+                );
+            }
+
+            gl.tex_parameter_i32(
+                glow::TEXTURE_CUBE_MAP,
+                glow::TEXTURE_MIN_FILTER,
+                glow::LINEAR as i32,
+            );
+
+            gl.tex_parameter_i32(
+                glow::TEXTURE_CUBE_MAP,
+                glow::TEXTURE_MAG_FILTER,
+                glow::LINEAR as i32,
+            );
+
+            gl.tex_parameter_i32(
+                glow::TEXTURE_CUBE_MAP,
+                glow::TEXTURE_WRAP_S,
+                glow::CLAMP_TO_EDGE as i32,
+            );
+
+            gl.tex_parameter_i32(
+                glow::TEXTURE_CUBE_MAP,
+                glow::TEXTURE_WRAP_T,
+                glow::CLAMP_TO_EDGE as i32,
+            );
+
+            gl.tex_parameter_i32(
+                glow::TEXTURE_CUBE_MAP,
+                glow::TEXTURE_WRAP_R,
+                glow::CLAMP_TO_EDGE as i32,
+            );
+
+            Ok(Self { id: texture })
         }
     }
 

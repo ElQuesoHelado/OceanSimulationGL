@@ -35,10 +35,30 @@ impl Instance {
     }
 }
 
+#[derive(Clone)]
+pub struct Skybox {
+    pub transform: Transform,
+    pub mesh_id: MeshId,
+    pub material: Material,
+}
+
+impl Skybox {
+    pub fn new(material: Material) -> Self {
+        let transform = Transform::new();
+
+        Self {
+            transform,
+            mesh_id: MeshId::Cube,
+            material,
+        }
+    }
+}
+
 pub struct Scene {
     pub normal_instances: Vec<Instance>,
     pub billboard_instances: Vec<Instance>,
     pub ocean_instances: Vec<Instance>,
+    pub skybox: Option<Skybox>,
 }
 
 impl Scene {
@@ -47,12 +67,17 @@ impl Scene {
             normal_instances: Vec::new(),
             billboard_instances: Vec::new(),
             ocean_instances: Vec::new(),
+            skybox: None,
         }
     }
 
     pub fn add_normal_instance(&mut self, instance: Instance) -> usize {
         self.normal_instances.push(instance);
         self.normal_instances.len() - 1
+    }
+
+    pub fn set_skybox_instance(&mut self, skybox: Skybox) {
+        self.skybox = Some(skybox);
     }
 
     pub fn add_ocean_instance(&mut self, instance: Instance) -> usize {

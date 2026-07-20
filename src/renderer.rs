@@ -206,7 +206,7 @@ impl OceanRenderer {
 
         shader.set_int(gl, "waveCount", waves.len() as i32);
 
-        let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 256., "ocean")
+        let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 128., "ocean")
             .expect("Textura no encontrada");
 
         let instance = Instance::new(MeshId::Plane, material);

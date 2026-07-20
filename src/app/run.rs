@@ -71,6 +71,10 @@ impl App {
             .skybox_renderer
             .draw(&state.graph_ctx, &state.scene.skybox, &state.camera);
 
+        // state
+        //     .skybox_renderer
+        //     .draw(&state.graph_ctx, &state.camera, &state.scene.skybox);
+
         //Render ImGui
         unsafe {
             state

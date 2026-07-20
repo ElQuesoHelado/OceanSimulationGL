@@ -281,12 +281,12 @@ impl SkyboxRenderer {
         };
 
         let gl = ctx.gl();
+        self.shader.activate(gl);
 
         unsafe {
             gl.depth_func(glow::LEQUAL);
         }
 
-        self.shader.activate(gl);
         self.shader.set_mat4(gl, "uView", &camera.view());
         self.shader
             .set_mat4(gl, "uProjection", &camera.projection());

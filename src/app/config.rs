@@ -101,7 +101,7 @@ impl App {
             color: vec3(1f32, 1f32, 1f32),
         };
 
-        let skybox = Skybox::new(&texture_library, "SanFrancisco");
+        let skybox = Skybox::new(&texture_library, "NissiBeach");
         scene.set_skybox_instance(skybox);
 
         //*************************
@@ -145,9 +145,12 @@ impl App {
         )
         .expect("Creacion de Renderer Piso Gizmo fallida");
 
-        let skybox_renderer =
-            SkyboxRenderer::new(&gl, "assets/shaders/skybox.vert", "assets/shaders/sb.frag")
-                .expect("Creacion de Renderer Skybox fallida");
+        let skybox_renderer = SkyboxRenderer::new(
+            &gl,
+            "assets/shaders/skybox.vert",
+            "assets/shaders/skybox.frag",
+        )
+        .expect("Creacion de Renderer Skybox fallida");
 
         let floor_gizmo = FloorGizmo::new(&gl);
 

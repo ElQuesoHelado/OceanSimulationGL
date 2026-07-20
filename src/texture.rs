@@ -186,7 +186,7 @@ impl CubeMap {
             let texture = gl.create_texture()?;
 
             gl.bind_texture(glow::TEXTURE_CUBE_MAP, Some(texture));
-            gl.bind_texture(glow::TEXTURE_CUBE_MAP, None);
+            // gl.bind_texture(glow::TEXTURE_CUBE_MAP, None);
 
             for (cube_map_orientation, path) in &faces {
                 let img = image::open(path).map_err(|e| e.to_string())?.into_rgba8();

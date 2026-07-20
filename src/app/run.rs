@@ -67,6 +67,10 @@ impl App {
             state.floor_gizmo.gizmo_color,
         );
 
+        state
+            .skybox_renderer
+            .draw(&state.graph_ctx, &state.scene.skybox, &state.camera);
+
         //Render ImGui
         unsafe {
             state

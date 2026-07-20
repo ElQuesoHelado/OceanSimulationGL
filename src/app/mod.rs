@@ -31,7 +31,9 @@ use crate::input_state::InputState;
 use crate::light::Light;
 use crate::material::Material;
 use crate::meshes::mesh::{MeshId, MeshLibrary};
-use crate::renderer::{BillboardRenderer, OceanRenderer, SimpleColorRenderer, StandardRenderer};
+use crate::renderer::{
+    BillboardRenderer, OceanRenderer, SimpleColorRenderer, SkyboxRenderer, StandardRenderer,
+};
 use crate::scene::{Instance, Scene};
 use crate::simulations::Simulation;
 use crate::texture::TextureLibrary;
@@ -120,6 +122,7 @@ struct AppState {
     standard_renderer: StandardRenderer,
     billboard_renderer: BillboardRenderer,
     floor_giz_renderer: SimpleColorRenderer,
+    skybox_renderer: SkyboxRenderer,
     ocean_renderer: OceanRenderer,
     graph_ctx: GraphicsContext,
     scene: Scene,

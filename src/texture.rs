@@ -18,6 +18,10 @@ impl TextureLibrary {
         self.textures.get(&id)
     }
 
+    pub fn get_cubemap_from_id(&self, id: u32) -> Option<&CubeMap> {
+        self.cube_maps.get(&id)
+    }
+
     pub fn get_texture_from_name(&self, name: &str) -> Option<&Texture> {
         self.get_texture_from_id(self.get_id_from_name(name)?)
     }

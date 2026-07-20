@@ -3,15 +3,6 @@ use crate::{scene::Skybox, simulations::ocean::Ocean};
 use super::*;
 
 impl App {
-    pub fn get_gl_context(&self) -> Option<&glow::Context> {
-        self.state
-            .as_ref()?
-            .graph_ctx
-            .renderer
-            .gl_context()
-            .map(|rc| rc.as_ref())
-    }
-
     pub fn resumed_impl(&mut self, event_loop: &ActiveEventLoop) {
         if self.state.is_some() {
             return;
@@ -154,6 +145,10 @@ impl App {
         )
         .expect("Creacion de Renderer Piso Gizmo fallida");
 
+        let skybox_renderer =
+            SkyboxRenderer::new(&gl, "assets/shaders/skybox.vert", "assets/shaders/sb.frag")
+                .expect("Creacion de Renderer Skybox fallida");
+
         let floor_gizmo = FloorGizmo::new(&gl);
 
         //*************************
@@ -179,6 +174,7 @@ impl App {
             ocean_renderer,
             billboard_renderer,
             floor_giz_renderer,
+            skybox_renderer,
             graph_ctx: GraphicsContext {
                 renderer,
                 mesh_library,

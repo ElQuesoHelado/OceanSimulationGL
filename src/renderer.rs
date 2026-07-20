@@ -7,7 +7,7 @@ use crate::{
     light::Light,
     material::Material,
     meshes::mesh::{MeshId, MeshLibrary, SimpleMesh},
-    scene::{self, Instance, Scene},
+    scene::{self, Instance, Scene, Skybox},
     shader::Shader,
     simulations::{Simulation, ocean::Wave},
     texture::TextureLibrary,
@@ -259,6 +259,54 @@ impl OceanRenderer {
             if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
                 v.draw(gl);
             };
+        }
+    }
+}
+
+pub struct SkyboxRenderer {
+    shader: Shader,
+}
+impl SkyboxRenderer {
+    pub fn new(gl: &glow::Context, vertex_path: &str, frag_path: &str) -> Result<Self, String> {
+        let shader = Shader::new(gl, vertex_path, frag_path)?;
+        shader.activate(gl);
+        shader.set_int(gl, "uSkybox", 0);
+
+        Ok(Self { shader })
+    }
+
+    pub fn draw(&self, ctx: &GraphicsContext, skybox_instance: &Option<Skybox>, camera: &Camera) {
+        let Some(skybox_instance) = skybox_instance else {
+            return;
+        };
+
+        let gl = ctx.gl();
+
+        unsafe {
+            gl.depth_func(glow::LEQUAL);
+        }
+
+        self.shader.activate(gl);
+        self.shader.set_mat4(gl, "uView", &camera.view());
+        self.shader
+            .set_mat4(gl, "uProjection", &camera.projection());
+
+        unsafe {
+            gl.active_texture(glow::TEXTURE0);
+            gl.bind_texture(
+                glow::TEXTURE_CUBE_MAP,
+                ctx.texture_library
+                    .get_cubemap_from_id(skybox_instance.cube_map_id)
+                    .map(|tex| tex.id),
+            );
+        }
+
+        if let Some(v) = ctx.mesh_library.get(skybox_instance.mesh_id) {
+            v.draw(gl)
+        };
+
+        unsafe {
+            gl.depth_func(glow::LESS);
         }
     }
 }

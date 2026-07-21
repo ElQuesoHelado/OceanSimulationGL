@@ -62,6 +62,15 @@ impl GraphicsContext {
             .expect("Glow Context no existente")
     }
 
+    pub fn gl_and_libraries(&mut self) -> (&glow::Context, &mut MeshLibrary, &mut TextureLibrary) {
+        let gl = self
+            .renderer
+            .gl_context()
+            .map(|e| &*e)
+            .expect("Glow Context no existente");
+        (gl, &mut self.mesh_library, &mut self.texture_library)
+    }
+
     pub fn resize(&self, width: i32, height: i32) {
         unsafe { self.gl().viewport(0, 0, width, height) };
     }

@@ -90,9 +90,12 @@ impl App {
 
         let ui = state.ui_ctx.imgui_ctx.frame();
 
+        let (gl, mesh_library, texture_library) = state.graph_ctx.gl_and_libraries();
+
         build_ui(
-            &state.graph_ctx.texture_library,
-            &state.graph_ctx.mesh_library,
+            gl,
+            texture_library,
+            mesh_library,
             &mut state.ui_state,
             ui,
             &mut state.scene,

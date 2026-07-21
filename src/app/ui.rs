@@ -3,8 +3,9 @@ use super::*;
 use dear_imgui_rs::{Condition, Ui, WindowFlags};
 
 pub fn build_ui(
+    gl: &glow::Context,
     texture_library: &TextureLibrary,
-    mesh_library: &MeshLibrary,
+    mesh_library: &mut MeshLibrary,
     ui_state: &mut UiState,
     ui: &Ui,
     scene: &mut Scene,
@@ -29,6 +30,22 @@ pub fn build_ui(
             ui.separator();
 
             ui.text("Figuras");
+
+            if ui.button("Load mesh") {
+                let mut dialog = rfd::FileDialog::new().add_filter("Mesh", &["glb", "obj"]);
+
+                if let Ok(cwd) = std::env::current_dir() {
+                    dialog = dialog.set_directory(cwd);
+                }
+
+                match dialog.pick_file() {
+                    Some(path) => {
+                        mesh_library.add_from_file(gl, &path);
+                        println!("Loaded: {:?}", path);
+                    }
+                    _ => (),
+                }
+            }
 
             for (label, mesh_id) in &mesh_library.names {
                 let is_selected = ui_state.mesh_to_draw == *mesh_id;

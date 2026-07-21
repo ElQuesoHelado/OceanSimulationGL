@@ -235,7 +235,7 @@ pub fn sphere() -> MeshData {
     MeshData::new(
         cast_slice(include_meshes_bytes_align_as!(f32, "sphere/positions.bin")),
         cast_slice(include_meshes_bytes_align_as!(f32, "sphere/normals.bin")),
-        &[[0f32, 0f32]],
+        cast_slice(include_meshes_bytes_align_as!(f32, "sphere/texcoords.bin")),
         cast_slice(include_meshes_bytes_align_as!(u32, "sphere/indices.bin")),
     )
 }

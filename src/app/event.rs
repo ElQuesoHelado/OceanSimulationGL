@@ -103,7 +103,7 @@ impl App {
                     state.input.on_keyboard_input(code, event.state);
 
                     match code {
-                        KeyCode::Escape => event_loop.exit(),
+                        //KeyCode::Escape => event_loop.exit(),
                         KeyCode::Backquote => {
                             state.ui_state.clear_selected_instance(&mut state.scene)
                         }

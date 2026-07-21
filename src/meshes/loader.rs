@@ -1,16 +1,33 @@
+use std::path::Path;
+
 use glam::{Mat3, Quat, Vec3};
-use gltf::{self, Error};
+use gltf::{self};
 
 use crate::{
     meshes::{mesh::AABB, mesh_data::MeshData},
     mops::Transform,
 };
 
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("error cargando GLTF: {0}")]
+    Gltf(#[from] gltf::Error),
+
+    #[error("error cargando OBJ: {0}")]
+    Obj(#[from] tobj::LoadError),
+
+    #[error("mesh sin nombre válido")]
+    InvalidName,
+}
+
 // Carga de meshes complejos/custom en formatos estandarizados
 // Se "aplana" todos los submeshes para respetar estructura MeshData
 // Algunos meshes NO tienen tanto texcoords ni vectores normales
 // Se genera una provicional
-pub fn load_mesh(path: &str, correction: Option<glam::Quat>) -> Result<MeshData, Error> {
+pub fn load_mesh<P: AsRef<Path>>(
+    path: P,
+    correction: Option<glam::Quat>,
+) -> Result<MeshData, Error> {
     let (document, buffers, _) = gltf::import(path)?;
 
     let mut positions: Vec<[f32; 3]> = Vec::new();
@@ -44,9 +61,6 @@ pub fn load_mesh(path: &str, correction: Option<glam::Quat>) -> Result<MeshData,
 
             indices.extend(idx.into_iter().map(|i| i + base));
         }
-        // if path == "assets/raw_meshes/SailShip.glb" && i == 3 {
-        //     break;
-        // }
     }
 
     if normals.is_empty() {
@@ -58,6 +72,84 @@ pub fn load_mesh(path: &str, correction: Option<glam::Quat>) -> Result<MeshData,
     }
 
     //Corregir rotaciones
+    let correction = correction.unwrap_or(Quat::IDENTITY);
+    let correction = Mat3::from_quat(correction);
+
+    for p in &mut positions {
+        *p = (correction * Vec3::from_array(*p)).to_array();
+    }
+
+    for n in &mut normals {
+        *n = (correction * Vec3::from_array(*n)).normalize().to_array();
+    }
+
+    let positions = positions.leak();
+
+    Ok(MeshData::new(
+        positions,
+        normals.leak(),
+        texcoords.leak(),
+        indices.leak(),
+    ))
+}
+
+pub fn load_obj_mesh<P: AsRef<Path>>(
+    path: P,
+    correction: Option<glam::Quat>,
+) -> Result<MeshData, Error> {
+    let load_opts = tobj::LoadOptions {
+        single_index: true,
+        triangulate: true,
+        ..Default::default()
+    };
+
+    let (models, _materials) = tobj::load_obj(path.as_ref(), &load_opts)?;
+
+    let mut positions: Vec<[f32; 3]> = Vec::new();
+    let mut normals: Vec<[f32; 3]> = Vec::new();
+    let mut texcoords: Vec<[f32; 2]> = Vec::new();
+    let mut indices: Vec<u32> = Vec::new();
+
+    for model in models {
+        let mesh = model.mesh;
+
+        let pos: Vec<[f32; 3]> = mesh
+            .positions
+            .chunks_exact(3)
+            .map(|p| [p[0], p[1], p[2]])
+            .collect();
+
+        let nor: Vec<[f32; 3]> = mesh
+            .normals
+            .chunks_exact(3)
+            .map(|n| [n[0], n[1], n[2]])
+            .collect();
+
+        let uv: Vec<[f32; 2]> = mesh
+            .texcoords
+            .chunks_exact(2)
+            .map(|t| [t[0], t[1]])
+            .collect();
+
+        let idx: Vec<u32> = mesh.indices;
+
+        let base = positions.len() as u32;
+
+        positions.extend(pos);
+        normals.extend(nor);
+        texcoords.extend(uv);
+
+        indices.extend(idx.into_iter().map(|i| i + base));
+    }
+
+    if normals.is_empty() {
+        normals = generate_normals(&positions, &indices);
+    }
+
+    if texcoords.is_empty() {
+        texcoords = generate_triplanar_uv(&positions, &normals);
+    }
+
     let correction = correction.unwrap_or(Quat::IDENTITY);
     let correction = Mat3::from_quat(correction);
 

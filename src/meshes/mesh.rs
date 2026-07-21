@@ -1,7 +1,8 @@
 use std::collections::HashMap;
+use std::path::Path;
 
+use crate::meshes::loader::{load_mesh, load_obj_mesh};
 use crate::meshes::mesh_data::MeshData;
-use crate::mops::Transform;
 use crate::scene::Instance;
 use crate::{material::Material, meshes::mesh_data};
 use glam::{Vec3, vec3};
@@ -195,7 +196,35 @@ impl MeshLibrary {
         Self { meshes, names }
     }
 
-    pub fn add(&mut self, gl: &glow::Context, data: MeshData, name: &str) {
+    pub fn add_from_file<P: AsRef<Path>>(&mut self, gl: &glow::Context, path: P) {
+        let path = path.as_ref();
+
+        let ext = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .map(|e| e.to_lowercase());
+
+        let data = match ext.as_deref() {
+            Some("glb") | Some("gltf") => load_mesh(path, None),
+            Some("obj") => load_obj_mesh(path, None),
+            _ => {
+                println!("Extension de mesh no soportada");
+                return;
+            }
+        };
+
+        let Ok(data) = data else {
+            println!("Mesh Invalido");
+            return;
+        };
+
+        let Some(name) = path.file_stem() else {
+            println!("Nombre Mesh Invalido");
+            return;
+        };
+
+        let name = &name.to_string_lossy().into_owned().to_lowercase();
+
         add_inner(
             gl,
             &mut self.meshes,

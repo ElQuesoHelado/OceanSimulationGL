@@ -2,25 +2,25 @@ use super::*;
 
 use dear_imgui_rs::{Condition, Ui, WindowFlags};
 
-const MESH_OPTIONS: &[(&str, MeshId)] = &[
-    ("Cubo", MeshId::Cube),
-    ("Esfera", MeshId::Sphere),
-    ("Toro", MeshId::Torus),
-    ("Botella", MeshId::Klein),
-    ("Roca", MeshId::Rock),
-    ("Pen", MeshId::Pen),
-    ("Cilindro", MeshId::Cylinder),
-    ("Tetraedro", MeshId::Tetrahedron),
-    ("Cono", MeshId::Cone),
-    ("Billboard", MeshId::Billboard),
-    ("Plane", MeshId::Plane),
-    ("Boat", MeshId::Boat),
-    ("EmptyIsland", MeshId::EmptyIsland),
-    ("Grass", MeshId::Grass),
-    ("Island", MeshId::Island),
-    ("PalmTree", MeshId::PalmTree),
-    ("SailBoat", MeshId::SailBoat),
-    ("Ship", MeshId::Ship),
+const MESH_OPTIONS: &[(&str, MeshHandle)] = &[
+    ("Cubo", MeshHandle::Cube),
+    ("Esfera", MeshHandle::Sphere),
+    ("Toro", MeshHandle::Torus),
+    ("Botella", MeshHandle::Klein),
+    ("Roca", MeshHandle::Rock),
+    ("Pen", MeshHandle::Pen),
+    ("Cilindro", MeshHandle::Cylinder),
+    ("Tetraedro", MeshHandle::Tetrahedron),
+    ("Cono", MeshHandle::Cone),
+    ("Billboard", MeshHandle::Billboard),
+    ("Plane", MeshHandle::Plane),
+    ("Boat", MeshHandle::Boat),
+    ("EmptyIsland", MeshHandle::EmptyIsland),
+    ("Grass", MeshHandle::Grass),
+    ("Island", MeshHandle::Island),
+    ("PalmTree", MeshHandle::PalmTree),
+    ("SailBoat", MeshHandle::SailBoat),
+    ("Ship", MeshHandle::Ship),
 ];
 
 pub fn build_ui(

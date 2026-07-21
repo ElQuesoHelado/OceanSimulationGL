@@ -1,29 +1,53 @@
 use std::f32::consts::PI;
 
-use glam::{vec3, vec4};
+use glam::{Vec3, vec3, vec4};
 
-use crate::{material::Material, meshes::mesh::MeshId, mops::Transform, texture::TextureLibrary};
+use crate::{
+    material::Material,
+    meshes::mesh::{MeshHandle, MeshLibrary},
+    mops::Transform,
+    texture::TextureLibrary,
+};
 
 #[derive(Clone)]
 pub struct Instance {
     pub transform: Transform,
-    pub mesh_id: MeshId,
+    pub mesh_id: MeshHandle,
     pub material: Material,
 }
 
 impl Instance {
-    pub fn new(mesh_id: MeshId, material: Material) -> Self {
+    pub fn new(
+        mesh_id: MeshHandle,
+        material: Material,
+        scale: Option<Vec3>,
+        rotate: Option<Vec3>,
+    ) -> Self {
         let mut transform = Transform::new();
+
+        if let Some(scale) = scale {
+            transform.scale(scale);
+        }
+
+        if let Some(rotate) = rotate {
+            transform
+                .rotate_x(rotate.x)
+                .rotate_y(rotate.y)
+                .rotate_z(rotate.z);
+        }
+
         match mesh_id {
-            MeshId::Boat | MeshId::PalmTree => transform.scale(vec3(500f32, 500f32, 500f32)),
-            MeshId::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
+            MeshHandle::Boat | MeshHandle::PalmTree => {
+                transform.scale(vec3(500f32, 500f32, 500f32))
+            }
+            MeshHandle::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
             // .rotate_x(-PI / 2f32),
-            MeshId::SailBoat => transform
+            MeshHandle::SailBoat => transform
                 .scale(vec3(3000f32, 3000f32, 3000f32))
                 .rotate_x(-PI / 2f32),
-            MeshId::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
-            MeshId::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
-            MeshId::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
+            MeshHandle::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
+            MeshHandle::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
+            MeshHandle::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
             _ => transform.scale(vec3(10f32, 10f32, 10f32)),
         };
 
@@ -38,19 +62,23 @@ impl Instance {
 #[derive(Clone)]
 pub struct Skybox {
     pub transform: Transform,
-    pub mesh_id: MeshId,
+    pub mesh_id: MeshHandle,
     pub cube_map_id: u32,
 }
 
 impl Skybox {
-    pub fn new(texture_library: &TextureLibrary, texture_name: &str) -> Option<Self> {
+    pub fn new(
+        texture_library: &TextureLibrary,
+        mesh_library: &MeshLibrary,
+        texture_name: &str,
+    ) -> Option<Self> {
         let transform = Transform::new();
 
         let cube_map_id = texture_library.get_id_from_name(texture_name)?;
 
         Some(Self {
             transform,
-            mesh_id: MeshId::Cube,
+            mesh_id: mesh_library.get_handle_from_name("cube")?,
             cube_map_id,
         })
     }

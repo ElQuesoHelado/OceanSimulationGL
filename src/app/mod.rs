@@ -30,7 +30,7 @@ use crate::gizmo::FloorGizmo;
 use crate::input_state::InputState;
 use crate::light::Light;
 use crate::material::Material;
-use crate::meshes::mesh::{MeshId, MeshLibrary};
+use crate::meshes::mesh::{MeshHandle, MeshLibrary};
 use crate::renderer::{
     BillboardRenderer, OceanRenderer, SimpleColorRenderer, SkyboxRenderer, StandardRenderer,
 };
@@ -87,7 +87,7 @@ pub struct UiContext {
 }
 
 struct UiState {
-    mesh_to_draw: MeshId,
+    mesh_to_draw: MeshHandle,
     selected_instance: Option<usize>,
     selected_material: Material,
     buffered_color: glam::Vec4,
@@ -97,9 +97,9 @@ struct UiState {
 }
 
 impl UiState {
-    pub fn new(default_texture_id: u32) -> Self {
+    pub fn new(default_texture_id: u32, default_mesh_to_draw: MeshHandle) -> Self {
         Self {
-            mesh_to_draw: MeshId::Cube,
+            mesh_to_draw: default_mesh_to_draw,
             selected_instance: None,
             selected_material: Material {
                 color: vec4(1f32, 1f32, 1f32, 1f32),

@@ -4,7 +4,7 @@ use glam::{Quat, Vec3, Vec4, vec3, vec4};
 
 use crate::{
     material::Material,
-    meshes::mesh::MeshId,
+    meshes::mesh::{MeshHandle, MeshLibrary},
     scene::{Instance, Scene},
     texture::TextureLibrary,
 };
@@ -48,7 +48,11 @@ fn wave_height_and_normal(x: f32, z: f32, time: f32, waves: &[Wave]) -> (f32, Ve
 }
 
 impl Ocean {
-    pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
+    pub fn new(
+        scene: &mut Scene,
+        texture_library: &TextureLibrary,
+        mesh_library: &MeshLibrary,
+    ) -> Self {
         let waves: Vec<Wave> = vec![
             Wave {
                 amplitude: 0.6f32,
@@ -76,7 +80,7 @@ impl Ocean {
             },
         ];
 
-        let inst_idx_start = setup(scene, texture_library);
+        let inst_idx_start = setup(scene, texture_library, mesh_library);
 
         Self {
             waves,
@@ -96,7 +100,7 @@ impl Ocean {
     }
 }
 
-fn setup(scene: &mut Scene, texture_library: &TextureLibrary) -> usize {
+fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &MeshLibrary) -> usize {
     let sun_material = Material::new(
         texture_library,
         vec4(255f32, 255f32, 50f32, 1f32),
@@ -114,21 +118,45 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary) -> usize {
     let sand_material = Material::new(texture_library, vec4(1.0, 0.7, 0.55, 1f32), 32f32, "blank")
         .expect("Error cargando textura");
 
-    let mut island1 = Instance::new(MeshId::Island, green_material);
+    let mut island1 = Instance::new(
+        mesh_library.get_handle_from_name("Island").unwrap(),
+        green_material,
+        Some(vec3(0.7f32, 0.7f32, 0.7f32)),
+        None,
+    );
     island1.transform.set_position(vec3(100f32, 5f32, 50f32));
 
-    let mut island2 = Instance::new(MeshId::EmptyIsland, sand_material);
+    let mut island2 = Instance::new(
+        mesh_library.get_handle_from_name("EmptyIsland").unwrap(),
+        sand_material,
+        Some(vec3(75f32, 200f32, 75f32)),
+        None,
+    );
     island2.transform.set_position(vec3(150f32, 5f32, 200f32));
 
-    let mut palm1 = Instance::new(MeshId::PalmTree, green_material);
+    let mut palm1 = Instance::new(
+        mesh_library.get_handle_from_name("PalmTree").unwrap(),
+        green_material,
+        Some(vec3(15f32, 15f32, 15f32)),
+        None,
+    );
     palm1.transform.set_position(vec3(150f32, 13f32, 200f32));
 
-    let mut palm2 = Instance::new(MeshId::PalmTree, green_material);
+    let mut palm2 = Instance::new(
+        mesh_library.get_handle_from_name("PalmTree").unwrap(),
+        green_material,
+        Some(vec3(15f32, 15f32, 15f32)),
+        None,
+    );
     palm2.transform.set_position(vec3(180f32, 10f32, 200f32));
 
-    let mut sun = Instance::new(MeshId::Billboard, sun_material);
+    let mut sun = Instance::new(
+        mesh_library.get_handle_from_name("Billboard").unwrap(),
+        sun_material,
+        Some(vec3(15f32, 15f32, 15f32)),
+        None,
+    );
     sun.transform.set_position(vec3(-200f32, 500f32, -200f32));
-    sun.transform.scale(vec3(10f32, 10f32, 10f32));
 
     scene.add_normal_instance(island1);
     scene.add_normal_instance(island2);

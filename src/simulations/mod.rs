@@ -2,7 +2,10 @@ pub mod ocean;
 pub mod rain;
 
 use crate::{
-    scene::Scene, simulations::ocean::Ocean, simulations::rain::Rain, texture::TextureLibrary,
+    meshes::mesh::MeshLibrary,
+    scene::Scene,
+    simulations::{ocean::Ocean, rain::Rain},
+    texture::TextureLibrary,
 };
 
 pub struct Simulation {
@@ -11,10 +14,14 @@ pub struct Simulation {
 }
 
 impl Simulation {
-    pub fn new(scene: &mut Scene, texture_library: &TextureLibrary) -> Self {
+    pub fn new(
+        scene: &mut Scene,
+        texture_library: &TextureLibrary,
+        mesh_library: &MeshLibrary,
+    ) -> Self {
         Self {
-            rain: Rain::new(scene, texture_library, 10),
-            ocean: Ocean::new(scene, texture_library),
+            rain: Rain::new(scene, texture_library, mesh_library, 10),
+            ocean: Ocean::new(scene, texture_library, mesh_library),
         }
     }
 

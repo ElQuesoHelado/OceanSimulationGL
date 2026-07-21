@@ -6,7 +6,7 @@ use rand::RngExt;
 
 use crate::{
     material::Material,
-    meshes::mesh::MeshId,
+    meshes::mesh::{MeshHandle, MeshLibrary},
     mops::Transform,
     scene::{Instance, Scene},
     texture::TextureLibrary,
@@ -22,12 +22,19 @@ pub struct Rain {
 }
 
 impl Rain {
-    pub fn new(scene: &mut Scene, texture_library: &TextureLibrary, n_drops: usize) -> Self {
+    pub fn new(
+        scene: &mut Scene,
+        texture_library: &TextureLibrary,
+        mesh_library: &MeshLibrary,
+        n_drops: usize,
+    ) -> Self {
         let mut rng = rand::rng();
         let mut drops = Vec::with_capacity(n_drops);
 
         let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 32., "blank")
             .expect("Textura no encontrada");
+
+        let mesh_handle = mesh_library.get_handle_from_name("billboard").unwrap();
 
         for _ in 0..n_drops {
             let transform = *Transform::new()
@@ -40,7 +47,7 @@ impl Rain {
 
             let id = scene.add_billboard_instance(Instance {
                 transform,
-                mesh_id: MeshId::Billboard,
+                mesh_id: mesh_handle,
                 material,
             });
 

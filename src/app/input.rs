@@ -1,5 +1,7 @@
 use glam::Mat4;
 
+use crate::meshes::mesh::MeshKind;
+
 use super::*;
 
 fn un_project(win: Vec3, view: Mat4, proj: Mat4, viewport: (f32, f32, f32, f32)) -> Vec3 {
@@ -169,8 +171,8 @@ impl UiState {
             camera.projection(),
         ));
 
-        match self.mesh_to_draw {
-            MeshId::Billboard => scene.billboard_instances.push(instance),
+        match self.mesh_to_draw.kind {
+            MeshKind::Billboard => scene.billboard_instances.push(instance),
             _ => scene.normal_instances.push(instance),
         }
     }

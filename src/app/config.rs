@@ -101,14 +101,14 @@ impl App {
             color: vec3(1f32, 1f32, 1f32),
         };
 
-        let skybox = Skybox::new(&texture_library, "NissiBeach");
+        let skybox = Skybox::new(&texture_library, &mesh_library, "NissiBeach");
         scene.set_skybox_instance(skybox);
 
         //*************************
         // Simulation
         //*************************
 
-        let simulation = Simulation::new(&mut scene, &texture_library);
+        let simulation = Simulation::new(&mut scene, &texture_library, &mesh_library);
 
         //*************************
         // Renderers
@@ -128,6 +128,7 @@ impl App {
             &simulation.ocean.waves,
             &mut scene,
             &texture_library,
+            &mesh_library,
         )
         .expect("Creacion de Renderer Ocean fallida");
 
@@ -169,6 +170,10 @@ impl App {
             .get_id_from_name("blank")
             .expect("No existe textura default(blank)");
 
+        let cube_mesh_id = mesh_library
+            .get_handle_from_name("cube")
+            .expect("No existe mesh default(cube)");
+
         self.state = Some(AppState {
             window,
             gl_context,
@@ -193,7 +198,7 @@ impl App {
                 imgui_ctx,
                 platform,
             },
-            ui_state: UiState::new(blank_tex_id),
+            ui_state: UiState::new(blank_tex_id, cube_mesh_id),
             time: 0.0,
         });
     }

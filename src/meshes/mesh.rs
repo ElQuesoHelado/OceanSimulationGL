@@ -1,67 +1,241 @@
+use std::collections::HashMap;
+
 use crate::meshes::mesh_data;
 use crate::meshes::mesh_data::MeshData;
 use glam::{Vec3, vec3};
 use glow::HasContext;
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
-pub enum MeshId {
-    Cube,
-    Cone,
-    Cylinder,
-    Klein,
-    Pen,
-    Rock,
-    Sphere,
-    Tetrahedron,
-    Torus,
+pub enum MeshKind {
+    Standard,
     Billboard,
-    Plane,
-    Boat,
-    EmptyIsland,
-    Grass,
-    Island,
-    PalmTree,
-    SailBoat,
-    Ship,
 }
 
-// Bebita de todos los meshes base
+#[derive(Clone, Copy, PartialEq, PartialOrd)]
+pub struct MeshHandle {
+    pub id: usize,
+    pub kind: MeshKind,
+}
+
+// #[derive(Clone, Copy, PartialEq, PartialOrd)]
+// pub enum MeshId {
+//     Cube,
+//     Cone,
+//     Cylinder,
+//     Klein,
+//     Pen,
+//     Rock,
+//     Sphere,
+//     Tetrahedron,
+//     Torus,
+//     Billboard,
+//     Plane,
+//     Boat,
+//     EmptyIsland,
+//     Grass,
+//     Island,
+//     PalmTree,
+//     SailBoat,
+//     Ship,
+// }
+
+fn add_inner(
+    gl: &glow::Context,
+    meshes: &mut Vec<Mesh>,
+    names: &mut HashMap<String, MeshHandle>,
+    data: MeshData,
+    name: &str,
+    kind: MeshKind,
+) {
+    meshes.push(Mesh::upload(gl, data));
+    names.insert(
+        name.to_string(),
+        MeshHandle {
+            id: names.len(),
+            kind,
+        },
+    );
+}
+
 pub struct MeshLibrary {
     meshes: Vec<Mesh>,
+    names: HashMap<String, MeshHandle>,
 }
 
 impl MeshLibrary {
     pub fn new(gl: &glow::Context) -> Self {
-        let meshes: Vec<Mesh> = vec![
-            Mesh::upload(gl, mesh_data::cube()),
-            Mesh::upload(gl, mesh_data::cone()),
-            Mesh::upload(gl, mesh_data::cylinder()),
-            Mesh::upload(gl, mesh_data::klein()),
-            Mesh::upload(gl, mesh_data::pen()),
-            Mesh::upload(gl, mesh_data::rock()),
-            Mesh::upload(gl, mesh_data::sphere()),
-            Mesh::upload(gl, mesh_data::tetrahedron()),
-            Mesh::upload(gl, mesh_data::torus()),
-            Mesh::upload(gl, mesh_data::billboard()),
-            Mesh::upload(gl, mesh_data::plane(400)),
-            Mesh::upload(gl, mesh_data::boat()),
-            Mesh::upload(gl, mesh_data::empty_island()),
-            Mesh::upload(gl, mesh_data::grass()),
-            Mesh::upload(gl, mesh_data::island()),
-            Mesh::upload(gl, mesh_data::palm_tree()),
-            Mesh::upload(gl, mesh_data::sail_boat()),
-            Mesh::upload(gl, mesh_data::ship()),
-        ];
+        let mut meshes: Vec<Mesh> = Vec::new();
+        let mut names: HashMap<String, MeshHandle> = HashMap::new();
 
-        Self { meshes }
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::cube(),
+            "cube",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::cone(),
+            "cone",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::cylinder(),
+            "cylinder",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::klein(),
+            "klein",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::pen(),
+            "pen",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::rock(),
+            "rock",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::sphere(),
+            "sphere",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::tetrahedron(),
+            "tetrahedron",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::torus(),
+            "torus",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::billboard(),
+            "billboard",
+            MeshKind::Billboard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::plane(400),
+            "plane",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::boat(),
+            "boat",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::empty_island(),
+            "empty_island",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::grass(),
+            "grass",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::island(),
+            "island",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::palm_tree(),
+            "palm_tree",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::sail_boat(),
+            "sail_boat",
+            MeshKind::Standard,
+        );
+        add_inner(
+            gl,
+            &mut meshes,
+            &mut names,
+            mesh_data::ship(),
+            "ship",
+            MeshKind::Standard,
+        );
+
+        Self { meshes, names }
     }
 
-    pub fn add(&mut self, gl: &glow::Context, data: MeshData) {
-        self.meshes.push(Mesh::upload(gl, data));
+    pub fn add(&mut self, gl: &glow::Context, data: MeshData, name: &str) {
+        add_inner(
+            gl,
+            &mut self.meshes,
+            &mut self.names,
+            data,
+            name,
+            MeshKind::Standard,
+        );
     }
 
-    pub fn get(&self, id: MeshId) -> Option<&Mesh> {
-        self.meshes.get(id as usize)
+    pub fn get_handle_from_name(&self, name: &str) -> Option<MeshHandle> {
+        self.names.get(name).copied()
+    }
+
+    pub fn get_from_name(&self, name: &str) -> Option<&Mesh> {
+        self.get(*self.names.get(name)?)
+    }
+
+    pub fn get(&self, handle: MeshHandle) -> Option<&Mesh> {
+        self.meshes.get(handle.id)
     }
 }
 

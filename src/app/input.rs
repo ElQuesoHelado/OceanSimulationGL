@@ -113,15 +113,15 @@ pub fn select_mesh(
         .filter(|(_, m)| {
             let (lo, ld) = ray_to_local(ray_origin, ray_dir, m.transform.matrix());
 
-            let Some(mesh) = mesh_library.get(m.mesh_id) else {
+            let Some(mesh) = mesh_library.get(m.mesh_handle) else {
                 return false;
             };
 
             ray_hits_aabb(lo, ld, mesh.data.aabb.min_point, mesh.data.aabb.max_point)
         })
         .min_by(|(_, a), (_, b)| {
-            let mesh_a = mesh_library.get(a.mesh_id).unwrap();
-            let mesh_b = mesh_library.get(b.mesh_id).unwrap();
+            let mesh_a = mesh_library.get(a.mesh_handle).unwrap();
+            let mesh_b = mesh_library.get(b.mesh_handle).unwrap();
 
             let center_a = mesh_a
                 .data
@@ -156,10 +156,18 @@ impl UiState {
         mouse_x: f32,
         mouse_y: f32,
         scene: &mut Scene,
+        mesh_library: &MeshLibrary,
         window: &Window,
         camera: &Camera,
     ) {
-        let mut instance = Instance::new(self.mesh_to_draw, self.selected_material, None, None);
+        let Some(mut instance) = mesh_library.instantiate_from_handle(
+            self.mesh_to_draw,
+            &self.selected_material,
+            None,
+            None,
+        ) else {
+            return;
+        };
 
         instance.transform.translate(closest_hit_planes(
             mouse_x,

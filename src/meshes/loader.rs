@@ -1,7 +1,10 @@
 use glam::{Mat3, Quat, Vec3};
 use gltf::{self, Error};
 
-use crate::meshes::{mesh::AABB, mesh_data::MeshData};
+use crate::{
+    meshes::{mesh::AABB, mesh_data::MeshData},
+    mops::Transform,
+};
 
 // Carga de meshes complejos/custom en formatos estandarizados
 // Se "aplana" todos los submeshes para respetar estructura MeshData
@@ -68,13 +71,12 @@ pub fn load_mesh(path: &str, correction: Option<glam::Quat>) -> Result<MeshData,
 
     let positions = positions.leak();
 
-    Ok(MeshData {
+    Ok(MeshData::new(
         positions,
-        normals: normals.leak(),
-        texcoords: texcoords.leak(),
-        indices: indices.leak(),
-        aabb: AABB::new(positions),
-    })
+        normals.leak(),
+        texcoords.leak(),
+        indices.leak(),
+    ))
 }
 
 fn generate_normals(positions: &[[f32; 3]], indices: &[u32]) -> Vec<[f32; 3]> {

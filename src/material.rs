@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::texture::TextureLibrary;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -10,6 +12,12 @@ pub struct Material {
 #[derive(Debug)]
 pub enum MaterialError {
     TextureNotFound,
+}
+
+impl fmt::Display for MaterialError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Textura no existente")
+    }
 }
 
 impl Material {

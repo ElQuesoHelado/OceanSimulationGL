@@ -1,7 +1,11 @@
 use std::f32::consts::FRAC_PI_2;
 
-use crate::meshes::{loader::load_mesh, mesh::AABB};
+use crate::{
+    meshes::{loader::load_mesh, mesh::AABB},
+    mops::Transform,
+};
 use bytemuck::cast_slice;
+use glam::vec3;
 
 // Datos crudos de un mesh(Cube, Sphere, ...)
 pub struct MeshData {
@@ -10,6 +14,29 @@ pub struct MeshData {
     pub texcoords: &'static [[f32; 2]],
     pub indices: &'static [u32],
     pub aabb: AABB,
+    pub correction: Transform,
+}
+
+impl MeshData {
+    pub fn new(
+        positions: &'static [[f32; 3]],
+        normals: &'static [[f32; 3]],
+        texcoords: &'static [[f32; 2]],
+        indices: &'static [u32],
+    ) -> Self {
+        let aabb = AABB::new(positions);
+        let scale_factor =
+            (3f32 * 20f32.powi(2)).sqrt() / (aabb.max_point - aabb.min_point).length();
+
+        MeshData {
+            positions,
+            normals,
+            texcoords,
+            indices,
+            aabb,
+            correction: *Transform::new().scale(vec3(scale_factor, scale_factor, scale_factor)),
+        }
+    }
 }
 
 #[repr(C)]
@@ -33,42 +60,40 @@ macro_rules! include_meshes_bytes_align_as {
 }
 
 pub fn cube() -> MeshData {
-    let positions = &[
-        // +X face
-        [0.5, -0.5, -0.5],
-        [0.5, 0.5, -0.5],
-        [0.5, 0.5, 0.5],
-        [0.5, -0.5, 0.5],
-        // -X face
-        [-0.5, -0.5, 0.5],
-        [-0.5, 0.5, 0.5],
-        [-0.5, 0.5, -0.5],
-        [-0.5, -0.5, -0.5],
-        // +Y face
-        [-0.5, 0.5, -0.5],
-        [-0.5, 0.5, 0.5],
-        [0.5, 0.5, 0.5],
-        [0.5, 0.5, -0.5],
-        // -Y face
-        [-0.5, -0.5, 0.5],
-        [-0.5, -0.5, -0.5],
-        [0.5, -0.5, -0.5],
-        [0.5, -0.5, 0.5],
-        // +Z face
-        [-0.5, -0.5, 0.5],
-        [0.5, -0.5, 0.5],
-        [0.5, 0.5, 0.5],
-        [-0.5, 0.5, 0.5],
-        // -Z face
-        [0.5, -0.5, -0.5],
-        [-0.5, -0.5, -0.5],
-        [-0.5, 0.5, -0.5],
-        [0.5, 0.5, -0.5],
-    ];
-
-    MeshData {
-        positions,
-        normals: &[
+    MeshData::new(
+        &[
+            // +X face
+            [0.5, -0.5, -0.5],
+            [0.5, 0.5, -0.5],
+            [0.5, 0.5, 0.5],
+            [0.5, -0.5, 0.5],
+            // -X face
+            [-0.5, -0.5, 0.5],
+            [-0.5, 0.5, 0.5],
+            [-0.5, 0.5, -0.5],
+            [-0.5, -0.5, -0.5],
+            // +Y face
+            [-0.5, 0.5, -0.5],
+            [-0.5, 0.5, 0.5],
+            [0.5, 0.5, 0.5],
+            [0.5, 0.5, -0.5],
+            // -Y face
+            [-0.5, -0.5, 0.5],
+            [-0.5, -0.5, -0.5],
+            [0.5, -0.5, -0.5],
+            [0.5, -0.5, 0.5],
+            // +Z face
+            [-0.5, -0.5, 0.5],
+            [0.5, -0.5, 0.5],
+            [0.5, 0.5, 0.5],
+            [-0.5, 0.5, 0.5],
+            // -Z face
+            [0.5, -0.5, -0.5],
+            [-0.5, -0.5, -0.5],
+            [-0.5, 0.5, -0.5],
+            [0.5, 0.5, -0.5],
+        ],
+        &[
             // +X
             [1.0, 0.0, 0.0],
             [1.0, 0.0, 0.0],
@@ -100,7 +125,7 @@ pub fn cube() -> MeshData {
             [0.0, 0.0, -1.0],
             [0.0, 0.0, -1.0],
         ],
-        texcoords: &[
+        &[
             // +X
             [0.0, 0.0],
             [1.0, 0.0],
@@ -132,7 +157,7 @@ pub fn cube() -> MeshData {
             [1.0, 1.0],
             [0.0, 1.0],
         ],
-        indices: &[
+        &[
             0, 1, 2, 2, 3, 0, // +X
             4, 5, 6, 6, 7, 4, // -X
             8, 9, 10, 10, 11, 8, // +Y
@@ -140,74 +165,58 @@ pub fn cube() -> MeshData {
             16, 17, 18, 18, 19, 16, // +Z
             20, 21, 22, 22, 23, 20, // -Z
         ],
-        aabb: AABB::new(positions),
-    }
+    )
 }
 
 pub fn cone() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(f32, "cone/positions.bin"));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "cone/normals.bin")),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(f32, "cone/texcoords.bin")),
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "cone/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(f32, "cone/positions.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "cone/normals.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "cone/texcoords.bin")),
+        cast_slice(include_meshes_bytes_align_as!(u32, "cone/indices.bin")),
+    )
 }
 
 pub fn cylinder() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(
-        f32,
-        "cylinder/positions.bin"
-    ));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "cylinder/normals.bin")),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(
+            f32,
+            "cylinder/positions.bin"
+        )),
+        cast_slice(include_meshes_bytes_align_as!(f32, "cylinder/normals.bin")),
+        cast_slice(include_meshes_bytes_align_as!(
             f32,
             "cylinder/texcoords.bin"
         )),
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "cylinder/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+        cast_slice(include_meshes_bytes_align_as!(u32, "cylinder/indices.bin")),
+    )
 }
 
 pub fn klein() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(f32, "klein/positions.bin"));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "klein/normals.bin")),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(f32, "klein/texcoords.bin")),
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "klein/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(f32, "klein/positions.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "klein/normals.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "klein/texcoords.bin")),
+        cast_slice(include_meshes_bytes_align_as!(u32, "klein/indices.bin")),
+    )
 }
 
 pub fn pen() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(f32, "pen/positions.bin"));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "pen/normals.bin")),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(f32, "pen/texcoords.bin")),
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "pen/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(f32, "pen/positions.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "pen/normals.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "pen/texcoords.bin")),
+        cast_slice(include_meshes_bytes_align_as!(u32, "pen/indices.bin")),
+    )
 }
 
 pub fn rock() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(f32, "rock/positions.bin"));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "rock/normals.bin")),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(f32, "rock/texcoords.bin")),
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "rock/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(f32, "rock/positions.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "rock/normals.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "rock/texcoords.bin")),
+        cast_slice(include_meshes_bytes_align_as!(u32, "rock/indices.bin")),
+    )
 }
 
 // pub fn sphere() -> MeshData {
@@ -223,73 +232,61 @@ pub fn rock() -> MeshData {
 // }
 
 pub fn sphere() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(f32, "sphere/positions.bin"));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "sphere/normals.bin")),
-        texcoords: &[[0f32, 0f32]],
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "sphere/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(f32, "sphere/positions.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "sphere/normals.bin")),
+        &[[0f32, 0f32]],
+        cast_slice(include_meshes_bytes_align_as!(u32, "sphere/indices.bin")),
+    )
 }
 
 pub fn tetrahedron() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(
-        f32,
-        "tetrahedron/positions.bin"
-    ));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(
+            f32,
+            "tetrahedron/positions.bin"
+        )),
+        cast_slice(include_meshes_bytes_align_as!(
             f32,
             "tetrahedron/normals.bin"
         )),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(
+        cast_slice(include_meshes_bytes_align_as!(
             f32,
             "tetrahedron/texcoords.bin"
         )),
-        indices: cast_slice(include_meshes_bytes_align_as!(
+        cast_slice(include_meshes_bytes_align_as!(
             u32,
             "tetrahedron/indices.bin"
         )),
-        aabb: AABB::new(positions),
-    }
+    )
 }
 
 pub fn torus() -> MeshData {
-    let positions = cast_slice(include_meshes_bytes_align_as!(f32, "torus/positions.bin"));
-
-    MeshData {
-        positions,
-        normals: cast_slice(include_meshes_bytes_align_as!(f32, "torus/normals.bin")),
-        texcoords: cast_slice(include_meshes_bytes_align_as!(f32, "torus/texcoords.bin")),
-        indices: cast_slice(include_meshes_bytes_align_as!(u32, "torus/indices.bin")),
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(
+        cast_slice(include_meshes_bytes_align_as!(f32, "torus/positions.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "torus/normals.bin")),
+        cast_slice(include_meshes_bytes_align_as!(f32, "torus/texcoords.bin")),
+        cast_slice(include_meshes_bytes_align_as!(u32, "torus/indices.bin")),
+    )
 }
 
 pub fn billboard() -> MeshData {
-    let positions = &[
-        [-0.5, -0.5, 0.0],
-        [0.5, -0.5, 0.0],
-        [0.5, 0.5, 0.0],
-        [-0.5, 0.5, 0.0],
-    ];
-
-    MeshData {
-        positions,
-        normals: &[
+    MeshData::new(
+        &[
+            [-0.5, -0.5, 0.0],
+            [0.5, -0.5, 0.0],
+            [0.5, 0.5, 0.0],
+            [-0.5, 0.5, 0.0],
+        ],
+        &[
             [0.0, 0.0, 1.0],
             [0.0, 0.0, 1.0],
             [0.0, 0.0, 1.0],
             [0.0, 0.0, 1.0],
         ],
-        texcoords: &[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]],
-        indices: &[0, 1, 2, 2, 3, 0],
-        aabb: AABB::new(positions),
-    }
+        &[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]],
+        &[0, 1, 2, 2, 3, 0],
+    )
 }
 
 pub fn plane(n_points: usize) -> MeshData {
@@ -341,13 +338,7 @@ pub fn plane(n_points: usize) -> MeshData {
 
     let texcoords: &'static [[f32; 2]] = texcoords.leak();
 
-    MeshData {
-        positions,
-        normals,
-        texcoords,
-        indices,
-        aabb: AABB::new(positions),
-    }
+    MeshData::new(positions, normals, texcoords, indices)
 }
 
 pub fn boat() -> MeshData {

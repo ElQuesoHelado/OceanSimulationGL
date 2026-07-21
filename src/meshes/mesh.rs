@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use crate::meshes::mesh_data;
 use crate::meshes::mesh_data::MeshData;
+use crate::mops::Transform;
+use crate::scene::Instance;
+use crate::{material::Material, meshes::mesh_data};
 use glam::{Vec3, vec3};
 use glow::HasContext;
 
@@ -16,28 +18,6 @@ pub struct MeshHandle {
     pub id: usize,
     pub kind: MeshKind,
 }
-
-// #[derive(Clone, Copy, PartialEq, PartialOrd)]
-// pub enum MeshId {
-//     Cube,
-//     Cone,
-//     Cylinder,
-//     Klein,
-//     Pen,
-//     Rock,
-//     Sphere,
-//     Tetrahedron,
-//     Torus,
-//     Billboard,
-//     Plane,
-//     Boat,
-//     EmptyIsland,
-//     Grass,
-//     Island,
-//     PalmTree,
-//     SailBoat,
-//     Ship,
-// }
 
 fn add_inner(
     gl: &glow::Context,
@@ -236,6 +216,49 @@ impl MeshLibrary {
 
     pub fn get(&self, handle: MeshHandle) -> Option<&Mesh> {
         self.meshes.get(handle.id)
+    }
+
+    pub fn instantiate_from_name(
+        &self,
+        name: &str,
+        material: &Material,
+        scale: Option<Vec3>,
+        rotate: Option<Vec3>,
+    ) -> Option<Instance> {
+        if let Some(handle) = self.get_handle_from_name(name) {
+            return self.instantiate_from_handle(handle, material, scale, rotate);
+        };
+
+        None
+    }
+
+    pub fn instantiate_from_handle(
+        &self,
+        mesh_handle: MeshHandle,
+        material: &Material,
+        scale: Option<Vec3>,
+        rotate: Option<Vec3>,
+    ) -> Option<Instance> {
+        let mesh = self.get(mesh_handle)?;
+
+        let mut transform = mesh.data.correction;
+
+        if let Some(scale) = scale {
+            transform.scale(scale);
+        }
+
+        if let Some(rotate) = rotate {
+            transform
+                .rotate_x(rotate.x)
+                .rotate_y(rotate.y)
+                .rotate_z(rotate.z);
+        }
+
+        Some(Instance {
+            mesh_handle,
+            transform,
+            material: *material,
+        })
     }
 }
 

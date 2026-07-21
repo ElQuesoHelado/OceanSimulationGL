@@ -64,6 +64,7 @@ impl App {
                                 state.input.mouse_x as f32,
                                 state.input.mouse_y as f32,
                                 &mut state.scene,
+                                &state.graph_ctx.mesh_library,
                                 &state.window,
                                 &state.camera,
                             ),

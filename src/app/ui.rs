@@ -61,10 +61,10 @@ pub fn build_ui(
             // --- Escala ---
             match stepper(ui, "SCL", "l1") {
                 Step::Plus => with_selected(ui_state, scene, |p| {
-                    p.transform.scale(vec3(1.1, 1.1, 1.1));
+                    p.transform.scale(vec3(1.5, 1.5, 1.5));
                 }),
                 Step::Minus => with_selected(ui_state, scene, |p| {
-                    p.transform.scale(vec3(0.9, 0.9, 0.9));
+                    p.transform.scale(vec3(0.5, 0.5, 0.5));
                 }),
                 Step::None => {}
             }

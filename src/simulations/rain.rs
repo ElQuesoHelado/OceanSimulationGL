@@ -47,7 +47,7 @@ impl Rain {
 
             let id = scene.add_billboard_instance(Instance {
                 transform,
-                mesh_id: mesh_handle,
+                mesh_handle,
                 material,
             });
 

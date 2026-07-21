@@ -60,7 +60,7 @@ impl StandardRenderer {
                 );
             }
 
-            match ctx.mesh_library.get(inst.mesh_id) {
+            match ctx.mesh_library.get(inst.mesh_handle) {
                 Some(v) => v.draw(gl),
                 None => continue,
             };
@@ -136,7 +136,7 @@ impl BillboardRenderer {
                 );
             }
 
-            if let Some(mesh) = ctx.mesh_library.get(inst.mesh_id) {
+            if let Some(mesh) = ctx.mesh_library.get(inst.mesh_handle) {
                 mesh.draw(gl);
             }
         }
@@ -208,14 +208,12 @@ impl OceanRenderer {
         shader.set_int(gl, "waveCount", waves.len() as i32);
 
         let material = Material::new(texture_library, vec4(1., 1., 1., 1.), 128., "ocean")
-            .expect("Textura no encontrada");
+            .map_err(|e| e.to_string())?;
 
-        let ocean_instance = Instance::new(
-            mesh_library.get_handle_from_name("plane").unwrap(),
-            material,
-            None,
-            None,
-        );
+        let ocean_instance = mesh_library
+            .instantiate_from_name("plane", &material, None, None)
+            .ok_or("No se pudo crear ocean")?;
+
         let instance_id = scene.add_ocean_instance(ocean_instance);
 
         Ok(Self {
@@ -262,7 +260,7 @@ impl OceanRenderer {
                 );
             }
 
-            if let Some(v) = ctx.mesh_library.get(inst.mesh_id) {
+            if let Some(v) = ctx.mesh_library.get(inst.mesh_handle) {
                 v.draw(gl);
             };
         }

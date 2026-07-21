@@ -118,44 +118,66 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
     let sand_material = Material::new(texture_library, vec4(1.0, 0.7, 0.55, 1f32), 32f32, "blank")
         .expect("Error cargando textura");
 
-    let mut island1 = Instance::new(
-        mesh_library.get_handle_from_name("island").unwrap(),
-        green_material,
-        Some(vec3(0.7f32, 0.7f32, 0.7f32)),
-        None,
-    );
+    // let mut island1 = mesh_library.instantiate_from_name(
+    //     "island",
+    //     &green_material,
+    //     Some(vec3(0.7f32, 0.7f32, 0.7f32)),
+    //     None,
+    // );
+
+    let mut island1 = mesh_library
+        .instantiate_from_name(
+            "island",
+            &green_material,
+            //Some(vec3(0.7f32, 0.7f32, 0.7f32)),
+            None,
+            None,
+        )
+        .expect("Instancia no creada simulacion ocean");
     island1.transform.set_position(vec3(100f32, 5f32, 50f32));
 
-    let mut island2 = Instance::new(
-        mesh_library.get_handle_from_name("empty_island").unwrap(),
-        sand_material,
-        Some(vec3(75f32, 200f32, 75f32)),
-        None,
-    );
+    let mut island2 = mesh_library
+        .instantiate_from_name(
+            "empty_island",
+            &sand_material,
+            //Some(vec3(75f32, 200f32, 75f32)),
+            None,
+            None,
+        )
+        .expect("Instancia no creada simulacion ocean");
     island2.transform.set_position(vec3(150f32, 5f32, 200f32));
 
-    let mut palm1 = Instance::new(
-        mesh_library.get_handle_from_name("palm_tree").unwrap(),
-        green_material,
-        Some(vec3(15f32, 15f32, 15f32)),
-        None,
-    );
+    let mut palm1 = mesh_library
+        .instantiate_from_name(
+            "palm_tree",
+            &green_material,
+            //Some(vec3(15f32, 15f32, 15f32)),
+            None,
+            None,
+        )
+        .expect("Instancia no creada simulacion ocean");
     palm1.transform.set_position(vec3(150f32, 13f32, 200f32));
 
-    let mut palm2 = Instance::new(
-        mesh_library.get_handle_from_name("palm_tree").unwrap(),
-        green_material,
-        Some(vec3(15f32, 15f32, 15f32)),
-        None,
-    );
+    let mut palm2 = mesh_library
+        .instantiate_from_name(
+            "palm_tree",
+            &green_material,
+            //Some(vec3(15f32, 15f32, 15f32)),
+            None,
+            None,
+        )
+        .expect("Instancia no creada simulacion ocean");
     palm2.transform.set_position(vec3(180f32, 10f32, 200f32));
 
-    let mut sun = Instance::new(
-        mesh_library.get_handle_from_name("billboard").unwrap(),
-        sun_material,
-        Some(vec3(15f32, 15f32, 15f32)),
-        None,
-    );
+    let mut sun = mesh_library
+        .instantiate_from_name(
+            "billboard",
+            &sun_material,
+            //Some(vec3(15f32, 15f32, 15f32)),
+            None,
+            None,
+        )
+        .expect("Instancia no creada simulacion ocean");
     sun.transform.set_position(vec3(-200f32, 500f32, -200f32));
 
     scene.add_normal_instance(island1);

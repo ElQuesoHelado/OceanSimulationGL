@@ -65,7 +65,7 @@ impl Camera {
     }
 
     pub fn zoom(&mut self, delta: f32) {
-        self.eye += self.forward() * delta * self.distance * 0.1;
+        self.eye += self.forward() * delta * self.distance * 0.01;
     }
 
     // pub fn pan(&mut self, dx: f32, dy: f32) {

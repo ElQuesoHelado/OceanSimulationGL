@@ -11,52 +11,52 @@ use crate::{
 
 #[derive(Clone)]
 pub struct Instance {
+    pub mesh_handle: MeshHandle,
     pub transform: Transform,
-    pub mesh_id: MeshHandle,
     pub material: Material,
 }
 
 impl Instance {
-    pub fn new(
-        mesh_id: MeshHandle,
-        material: Material,
-        scale: Option<Vec3>,
-        rotate: Option<Vec3>,
-    ) -> Self {
-        let mut transform = Transform::new();
-
-        if let Some(scale) = scale {
-            transform.scale(scale);
-        }
-
-        if let Some(rotate) = rotate {
-            transform
-                .rotate_x(rotate.x)
-                .rotate_y(rotate.y)
-                .rotate_z(rotate.z);
-        }
-
-        // match mesh_id {
-        //     MeshHandle::Boat | MeshHandle::PalmTree => {
-        //         transform.scale(vec3(500f32, 500f32, 500f32))
-        //     }
-        //     MeshHandle::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
-        //     // .rotate_x(-PI / 2f32),
-        //     MeshHandle::SailBoat => transform
-        //         .scale(vec3(3000f32, 3000f32, 3000f32))
-        //         .rotate_x(-PI / 2f32),
-        //     MeshHandle::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
-        //     MeshHandle::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
-        //     MeshHandle::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
-        //     _ => transform.scale(vec3(10f32, 10f32, 10f32)),
-        // };
-
-        Self {
-            transform,
-            mesh_id,
-            material,
-        }
-    }
+    // pub fn new(
+    //     mesh_handle: MeshHandle,
+    //     material: Material,
+    //     scale: Option<Vec3>,
+    //     rotate: Option<Vec3>,
+    // ) -> Self {
+    //     let mut transform = Transform::new();
+    //
+    //     // if let Some(scale) = scale {
+    //     //     transform.scale(scale);
+    //     // }
+    //     //
+    //     // if let Some(rotate) = rotate {
+    //     //     transform
+    //     //         .rotate_x(rotate.x)
+    //     //         .rotate_y(rotate.y)
+    //     //         .rotate_z(rotate.z);
+    //     // }
+    //
+    //     // match mesh_id {
+    //     //     MeshHandle::Boat | MeshHandle::PalmTree => {
+    //     //         transform.scale(vec3(500f32, 500f32, 500f32))
+    //     //     }
+    //     //     MeshHandle::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
+    //     //     // .rotate_x(-PI / 2f32),
+    //     //     MeshHandle::SailBoat => transform
+    //     //         .scale(vec3(3000f32, 3000f32, 3000f32))
+    //     //         .rotate_x(-PI / 2f32),
+    //     //     MeshHandle::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
+    //     //     MeshHandle::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
+    //     //     MeshHandle::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
+    //     //     _ => transform.scale(vec3(10f32, 10f32, 10f32)),
+    //     // };
+    //
+    //     Self {
+    //         mesh_handle,
+    //         transform,
+    //         material,
+    //     }
+    // }
 }
 
 #[derive(Clone)]

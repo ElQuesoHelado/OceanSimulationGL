@@ -97,8 +97,13 @@ impl Ocean {
 }
 
 fn setup(scene: &mut Scene, texture_library: &TextureLibrary) -> usize {
-    let sun_material = Material::new(texture_library, Vec4::ONE, 200f32, "hinojosa")
-        .expect("Error cargando textura");
+    let sun_material = Material::new(
+        texture_library,
+        vec4(255f32, 255f32, 50f32, 1f32),
+        200f32,
+        "blank",
+    )
+    .expect("Error cargando textura");
 
     let wood_material = Material::new(texture_library, Vec4::ONE, 32f32, "roof_wood")
         .expect("Error cargando textura");
@@ -123,7 +128,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary) -> usize {
 
     let mut sun = Instance::new(MeshId::Billboard, sun_material);
     sun.transform.set_position(vec3(-200f32, 500f32, -200f32));
-    sun.transform.scale(vec3(5f32, 10f32, 5f32));
+    sun.transform.scale(vec3(10f32, 10f32, 10f32));
 
     scene.add_normal_instance(island1);
     scene.add_normal_instance(island2);

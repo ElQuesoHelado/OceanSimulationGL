@@ -156,12 +156,6 @@ impl Texture {
 
 pub struct CubeMap {
     pub id: glow::Texture,
-    // pub p_posx: String,
-    // pub p_posy: String,
-    // pub p_posz: String,
-    // pub p_negx: String,
-    // pub p_negy: String,
-    // pub p_negz: String,
 }
 
 impl CubeMap {

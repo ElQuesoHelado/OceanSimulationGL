@@ -159,7 +159,7 @@ impl UiState {
         window: &Window,
         camera: &Camera,
     ) {
-        let mut instance = Instance::new(self.mesh_to_draw, self.selected_material);
+        let mut instance = Instance::new(self.mesh_to_draw, self.selected_material, None, None);
 
         instance.transform.translate(closest_hit_planes(
             mouse_x,

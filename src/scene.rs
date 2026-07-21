@@ -36,20 +36,20 @@ impl Instance {
                 .rotate_z(rotate.z);
         }
 
-        match mesh_id {
-            MeshHandle::Boat | MeshHandle::PalmTree => {
-                transform.scale(vec3(500f32, 500f32, 500f32))
-            }
-            MeshHandle::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
-            // .rotate_x(-PI / 2f32),
-            MeshHandle::SailBoat => transform
-                .scale(vec3(3000f32, 3000f32, 3000f32))
-                .rotate_x(-PI / 2f32),
-            MeshHandle::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
-            MeshHandle::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
-            MeshHandle::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
-            _ => transform.scale(vec3(10f32, 10f32, 10f32)),
-        };
+        // match mesh_id {
+        //     MeshHandle::Boat | MeshHandle::PalmTree => {
+        //         transform.scale(vec3(500f32, 500f32, 500f32))
+        //     }
+        //     MeshHandle::Ship => transform.scale(vec3(600f32, 600f32, 600f32)),
+        //     // .rotate_x(-PI / 2f32),
+        //     MeshHandle::SailBoat => transform
+        //         .scale(vec3(3000f32, 3000f32, 3000f32))
+        //         .rotate_x(-PI / 2f32),
+        //     MeshHandle::Island => transform.scale(vec3(0.7f32, 0.7f32, 0.7f32)),
+        //     MeshHandle::EmptyIsland => transform.scale(vec3(75f32, 200f32, 75f32)),
+        //     MeshHandle::Grass => transform.scale(vec3(30f32, 10f32, 30f32)),
+        //     _ => transform.scale(vec3(10f32, 10f32, 10f32)),
+        // };
 
         Self {
             transform,

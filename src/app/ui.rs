@@ -2,29 +2,9 @@ use super::*;
 
 use dear_imgui_rs::{Condition, Ui, WindowFlags};
 
-const MESH_OPTIONS: &[(&str, MeshHandle)] = &[
-    ("Cubo", MeshHandle::Cube),
-    ("Esfera", MeshHandle::Sphere),
-    ("Toro", MeshHandle::Torus),
-    ("Botella", MeshHandle::Klein),
-    ("Roca", MeshHandle::Rock),
-    ("Pen", MeshHandle::Pen),
-    ("Cilindro", MeshHandle::Cylinder),
-    ("Tetraedro", MeshHandle::Tetrahedron),
-    ("Cono", MeshHandle::Cone),
-    ("Billboard", MeshHandle::Billboard),
-    ("Plane", MeshHandle::Plane),
-    ("Boat", MeshHandle::Boat),
-    ("EmptyIsland", MeshHandle::EmptyIsland),
-    ("Grass", MeshHandle::Grass),
-    ("Island", MeshHandle::Island),
-    ("PalmTree", MeshHandle::PalmTree),
-    ("SailBoat", MeshHandle::SailBoat),
-    ("Ship", MeshHandle::Ship),
-];
-
 pub fn build_ui(
     texture_library: &TextureLibrary,
+    mesh_library: &MeshLibrary,
     ui_state: &mut UiState,
     ui: &Ui,
     scene: &mut Scene,
@@ -50,7 +30,7 @@ pub fn build_ui(
 
             ui.text("Figuras");
 
-            for (label, mesh_id) in MESH_OPTIONS {
+            for (label, mesh_id) in &mesh_library.names {
                 let is_selected = ui_state.mesh_to_draw == *mesh_id;
                 if ui.selectable_config(label).selected(is_selected).build() {
                     ui_state.mesh_to_draw = *mesh_id;

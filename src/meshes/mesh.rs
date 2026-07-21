@@ -59,7 +59,7 @@ fn add_inner(
 
 pub struct MeshLibrary {
     meshes: Vec<Mesh>,
-    names: HashMap<String, MeshHandle>,
+    pub names: HashMap<String, MeshHandle>,
 }
 
 impl MeshLibrary {

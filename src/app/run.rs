@@ -92,6 +92,7 @@ impl App {
 
         build_ui(
             &state.graph_ctx.texture_library,
+            &state.graph_ctx.mesh_library,
             &mut state.ui_state,
             ui,
             &mut state.scene,

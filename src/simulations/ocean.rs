@@ -119,7 +119,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
         .expect("Error cargando textura");
 
     let mut island1 = Instance::new(
-        mesh_library.get_handle_from_name("Island").unwrap(),
+        mesh_library.get_handle_from_name("island").unwrap(),
         green_material,
         Some(vec3(0.7f32, 0.7f32, 0.7f32)),
         None,
@@ -127,7 +127,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
     island1.transform.set_position(vec3(100f32, 5f32, 50f32));
 
     let mut island2 = Instance::new(
-        mesh_library.get_handle_from_name("EmptyIsland").unwrap(),
+        mesh_library.get_handle_from_name("empty_island").unwrap(),
         sand_material,
         Some(vec3(75f32, 200f32, 75f32)),
         None,
@@ -135,7 +135,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
     island2.transform.set_position(vec3(150f32, 5f32, 200f32));
 
     let mut palm1 = Instance::new(
-        mesh_library.get_handle_from_name("PalmTree").unwrap(),
+        mesh_library.get_handle_from_name("palm_tree").unwrap(),
         green_material,
         Some(vec3(15f32, 15f32, 15f32)),
         None,
@@ -143,7 +143,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
     palm1.transform.set_position(vec3(150f32, 13f32, 200f32));
 
     let mut palm2 = Instance::new(
-        mesh_library.get_handle_from_name("PalmTree").unwrap(),
+        mesh_library.get_handle_from_name("palm_tree").unwrap(),
         green_material,
         Some(vec3(15f32, 15f32, 15f32)),
         None,
@@ -151,7 +151,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
     palm2.transform.set_position(vec3(180f32, 10f32, 200f32));
 
     let mut sun = Instance::new(
-        mesh_library.get_handle_from_name("Billboard").unwrap(),
+        mesh_library.get_handle_from_name("billboard").unwrap(),
         sun_material,
         Some(vec3(15f32, 15f32, 15f32)),
         None,

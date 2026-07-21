@@ -88,6 +88,7 @@ pub struct UiContext {
 
 struct UiState {
     mesh_to_draw: MeshHandle,
+    mesh_name: String,
     selected_instance: Option<usize>,
     selected_material: Material,
     buffered_color: glam::Vec4,
@@ -100,6 +101,7 @@ impl UiState {
     pub fn new(default_texture_id: u32, default_mesh_to_draw: MeshHandle) -> Self {
         Self {
             mesh_to_draw: default_mesh_to_draw,
+            mesh_name: "cube".to_string(),
             selected_instance: None,
             selected_material: Material {
                 color: vec4(1f32, 1f32, 1f32, 1f32),

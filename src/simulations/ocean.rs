@@ -135,6 +135,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
         )
         .expect("Instancia no creada simulacion ocean");
     island1.transform.set_position(vec3(100f32, 5f32, 50f32));
+    island1.transform.scale(vec3(4f32, 4f32, 4f32));
 
     let mut island2 = mesh_library
         .instantiate_from_name(
@@ -146,6 +147,7 @@ fn setup(scene: &mut Scene, texture_library: &TextureLibrary, mesh_library: &Mes
         )
         .expect("Instancia no creada simulacion ocean");
     island2.transform.set_position(vec3(150f32, 5f32, 200f32));
+    island2.transform.scale(vec3(4f32, 7f32, 4f32));
 
     let mut palm1 = mesh_library
         .instantiate_from_name(
